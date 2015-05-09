@@ -11,3 +11,6 @@ pip-selfcheck.json
 # Python
 __pycache__/
 *.py[cod]
+
+# Downloaded files
+/download

@@ -1,0 +1,27 @@
+import re
+import shutil
+import os
+from urllib.request import urlopen
+
+
+def download_file(url, folder):
+    basename = re.sub('[^A-Za-z0-9.]+', '-', url.split('/')[-1])
+    print('Download image:', basename)
+    filename = os.path.join(folder, basename)
+    with urlopen(url) as response, open(filename, 'wb') as file_:
+        shutil.copyfileobj(response, file_)
+
+def download_files(urls, directory):
+    count = 0
+    for url in urls:
+        try:
+            download_file(url, directory)
+            count += 1
+        except:
+            print('An error occured')
+    return count
+
+def ensure_directory(directory):
+    directory = os.path.join(directory)
+    if not os.path.exists(directory):
+        os.makedirs(directory)

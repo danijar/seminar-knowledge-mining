@@ -1,2 +1,15 @@
-SimplePool==0.1
 beautifulsoup4==4.3.2
+decorator==3.4.2
+matplotlib==1.4.3
+networkx==1.9.1
+nose==1.3.6
+numpy==1.9.2
+Pillow==2.8.1
+pyparsing==2.0.3
+python-dateutil==2.4.2
+pytz==2015.4
+scikit-image==0.11.3
+scikit-learn==0.16.1
+scipy==0.15.1
+SimplePool==0.1
+six==1.9.0

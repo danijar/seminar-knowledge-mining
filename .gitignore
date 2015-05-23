@@ -4,6 +4,8 @@
 /Scripts
 /bin
 /local
+/man
+/share
 
 # Pip
 pip-selfcheck.json

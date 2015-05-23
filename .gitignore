@@ -9,6 +9,7 @@
 
 # Pip
 pip-selfcheck.json
+*.whl
 
 # Python
 __pycache__/

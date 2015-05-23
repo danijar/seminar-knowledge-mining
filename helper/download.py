@@ -4,10 +4,10 @@ import os
 from urllib.request import urlopen
 
 
-def download_file(url, folder):
+def download_file(url, directory):
     basename = re.sub('[^A-Za-z0-9.]+', '-', url.split('/')[-1])
     print('Download image:', basename)
-    filename = os.path.join(folder, basename)
+    filename = os.path.join(directory, basename)
     with urlopen(url) as response, open(filename, 'wb') as file_:
         shutil.copyfileobj(response, file_)
 

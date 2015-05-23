@@ -1,7 +1,7 @@
 from urllib.request import urlopen
 from bs4 import BeautifulSoup
 from argparse import ArgumentParser
-from utils import ensure_directory, download_files
+from helper.download import ensure_directory, download_files
 
 
 def random_article():

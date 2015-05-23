@@ -1,7 +1,7 @@
 import json
 from urllib.request import Request, urlopen
 from argparse import ArgumentParser
-from utils import ensure_directory, download_files
+from helper.download import ensure_directory, download_files
 
 
 def google_images_request(query, page):

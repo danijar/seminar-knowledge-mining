@@ -21,7 +21,7 @@ if __name__ == '__main__':
         'random Wikipedia articles.')
     parser.add_argument('-n', '--count', type=int, default=20,
         help='Rough amount of images to download')
-    parser.add_argument('-d', '--directory', default='download/wikipedia',
+    parser.add_argument('-d', '--directory', default='data/wikipedia',
         help='Directory to download images into; gets created if not exists')
     args = parser.parse_args()
 

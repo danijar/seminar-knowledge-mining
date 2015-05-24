@@ -36,7 +36,7 @@ if __name__ == '__main__':
         help='Search term')
     parser.add_argument('-p', '--pages', type=int, default=8,
         help='Amount of result pages to fetch; up to 8')
-    parser.add_argument('-d', '--directory', default='download/google/<query>',
+    parser.add_argument('-d', '--directory', default='data/google/<query>',
         help='Directory to download images into; gets created if not exists')
     args = parser.parse_args()
 

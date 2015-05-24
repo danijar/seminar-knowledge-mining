@@ -37,7 +37,7 @@ if __name__ == '__main__':
         help='Directory containing the image files')
     parser.add_argument('-t', '--tagging', required=True,
         help='Filename of mapping from image names to tags')
-    parser.add_argument('-o', '--output', required=True,
+    parser.add_argument('-o', '--output', default='data/class',
         help='Directory the tag directories and images should be places in')
     args = parser.parse_args()
 

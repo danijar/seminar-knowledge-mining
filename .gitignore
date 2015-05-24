@@ -16,4 +16,4 @@ __pycache__/
 *.py[cod]
 
 # Downloaded files
-/download
+/data

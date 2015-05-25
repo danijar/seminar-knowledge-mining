@@ -1,7 +1,7 @@
 from urllib.request import urlopen
 from bs4 import BeautifulSoup
 from argparse import ArgumentParser
-from helper.download import ensure_directory, download_files
+from helper.download import ensure_directory, download_files, safe_characters
 
 
 def random_article():
@@ -10,7 +10,7 @@ def random_article():
 def images_in_article(url):
     html = urlopen(url).read().decode('utf-8')
     soup = BeautifulSoup(html)
-    title = soup.find('h1', id='firstHeading').string
+    title = safe_characters(soup.find('h1', id='firstHeading').string)
     print('Parse article:', title)
     for wrapper in soup.find_all('a', class_='image'):
         img = wrapper.find('img', recursive=False)

@@ -5,7 +5,7 @@ from urllib.request import urlopen
 
 
 def download_file(url, directory):
-    basename = re.sub('[^A-Za-z0-9.]+', '-', url.split('/')[-1])
+    basename = safe_characters(url.split('/')[-1])
     print('Download image:', basename)
     filename = os.path.join(directory, basename)
     with urlopen(url) as response, open(filename, 'wb') as file_:
@@ -20,6 +20,11 @@ def download_files(urls, directory):
         except:
             print('An error occured')
     return count
+
+def safe_characters(text):
+    if not text:
+        return 'unknown'
+    return re.sub('[^A-Za-z0-9.]+', '-', text)
 
 def ensure_directory(directory):
     directory = os.path.join(directory)

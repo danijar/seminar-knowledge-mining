@@ -1,5 +1,5 @@
 import json
-from urllib.request import Request, urlopen
+from urllib.request import Request, urlopen, quote_plus
 from argparse import ArgumentParser
 from helper.download import ensure_directory, download_files
 
@@ -7,8 +7,9 @@ from helper.download import ensure_directory, download_files
 def google_images_request(query, page):
     assert 0 <= page <= 7
     # Prepare url
-    userip = '85.182.0.136'
     api = 'https://ajax.googleapis.com/ajax/services/search/images'
+    query = quote_plus(query)
+    userip = '85.182.0.136'
     start = int(8 * page)
     url = '{api}?v=1.0&q={query}&userip={userip}&rsz=8&start={start}'.format(**locals())
     # Prepare request

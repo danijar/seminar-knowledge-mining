@@ -1,12 +1,19 @@
-from PIL import Image, ImageOps
+import skimage.io
+import skimage.transform
+import skimage.exposure
+import numpy as np
+import matplotlib.pyplot
 
 
-def load(filename, size=64, ignore_extrema=5):
-    """
-    Loads an image and returns both the original as well as a
-    preprocessed version.
-    """
-    original = Image.open(filename)
-    resized = original.resize((size, size), Image.LANCZOS)
-    normalized = ImageOps.autocontrast(resized, ignore_extrema)
-    return original, normalized
+def load(filename):
+    image = skimage.io.imread(filename)
+    nearest = 0
+    image = skimage.transform.resize(image, (128, 128), order=nearest)
+    ignore_extrema = (np.percentile(image, 2), np.percentile(image, 98))
+    image = skimage.exposure.rescale_intensity(image, in_range=ignore_extrema)
+    return image
+
+def show(image):
+    matplotlib.pyplot.figure()
+    skimage.io.imshow(image)
+    skimage.io.show()

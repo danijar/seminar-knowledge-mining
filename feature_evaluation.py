@@ -28,11 +28,11 @@ def get_statistics_of_folders(root):
     variances = []
     for directory in next(os.walk(root))[1]:
         print('Directory', directory)
-        classes.append(directory)
         statistics = get_statistics_of_folder(os.path.join(root, directory))
         # Skip empty folders
         if not statistics:
             continue
+        classes.append(directory)
         mean, variance = statistics
         means.append(mean)
         variances.append(variance)

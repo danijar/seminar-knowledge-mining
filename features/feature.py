@@ -24,3 +24,8 @@ class Feature:
 
     def show(self):
         raise NotImplementedError
+
+    def multiple_names(self, name, amount):
+        for i in range(amount):
+            yield '{}_{}'.format(name, i)
+

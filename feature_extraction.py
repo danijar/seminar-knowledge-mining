@@ -4,6 +4,7 @@ from helper.image import load, show
 from features.color import ColorFeature
 from features.histogram import HistogramFeature
 from features.blob import BlobFeature
+from features.gradient import GradientFeature
 
 
 def apply_extractors(image, extractors):
@@ -21,6 +22,7 @@ def validate_feature_range(names, features):
         assert 0 <= feature <= 1, name + ' is not between 0 and 1'
 
 def print_features(names, features):
+    print(len(names), 'features extracted:')
     for name, feature in zip(names, features):
         print('{name: <25} {feature: >8.4f}'.format(**locals()))
 
@@ -33,12 +35,13 @@ if __name__ == '__main__':
     extractors = [
         ColorFeature,
         HistogramFeature,
-        BlobFeature
+        BlobFeature,
+        GradientFeature
     ]
 
     image = load(args.filename)
     # show(image)
-    # BlobFeature(image).show()
+    # GradientFeature(image).show()
 
     names, features = apply_extractors(image, extractors)
     validate_feature_range(names, features)

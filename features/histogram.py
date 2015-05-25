@@ -14,10 +14,6 @@ class HistogramFeature(Feature):
         for name in ['hue', 'saturation', 'value']:
             yield from self.multiple_names('histogram_' + name, self.bins)
 
-    def multiple_names(self, name, amount):
-        for i in range(amount):
-            yield '{}_{}'.format(name, i)
-
     def extract(self):
         for i in range(3):
             channel = self.hsv[:,:,i]

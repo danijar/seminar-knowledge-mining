@@ -4,6 +4,7 @@ from .feature import Feature
 
 
 class HistogramFeature(Feature):
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.hsv = skimage.color.rgb2hsv(self.image)

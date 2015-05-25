@@ -3,6 +3,7 @@ from argparse import ArgumentParser
 from helper.image import load, show
 from features.color import ColorFeature
 from features.histogram import HistogramFeature
+from features.blob import BlobFeature
 
 
 def apply_extractors(image, extractors):
@@ -14,6 +15,10 @@ def apply_extractors(image, extractors):
         features += list(instance.extract())
     assert len(names) == len(features)
     return names, features
+
+def validate_feature_range(names, features):
+    for name, feature in zip(names, features):
+        assert 0 <= feature <= 1, name + ' is not between 0 and 1'
 
 def print_features(names, features):
     for name, feature in zip(names, features):
@@ -27,10 +32,14 @@ if __name__ == '__main__':
 
     extractors = [
         ColorFeature,
-        HistogramFeature
+        HistogramFeature,
+        BlobFeature
     ]
 
     image = load(args.filename)
     # show(image)
+    # BlobFeature(image).show()
+
     names, features = apply_extractors(image, extractors)
+    validate_feature_range(names, features)
     print_features(names, features)

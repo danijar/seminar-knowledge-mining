@@ -13,8 +13,8 @@ class Feature:
         self.channels.setflags(write=False)
         self.pixels.setflags(write=False)
 
-    def names():
+    def names(self):
         raise NotImplementedError
 
-    def extract():
+    def extract(self):
         raise NotImplementedError

@@ -2,20 +2,22 @@ import numpy as np
 from argparse import ArgumentParser
 from helper.image import load, show
 from features.color import ColorFeature
+from features.histogram import HistogramFeature
 
 
 def apply_extractors(image, extractors):
     names = []
     features = []
     for extractor in extractors:
-        names += extractor.names()
-        features += extractor(image).extract()
+        instance = extractor(image)
+        names += list(instance.names())
+        features += list(instance.extract())
     assert len(names) == len(features)
     return names, features
 
 def print_features(names, features):
     for name, feature in zip(names, features):
-        print('{name: <25} {feature: >8.3f}'.format(**locals()))
+        print('{name: <25} {feature: >8.4f}'.format(**locals()))
 
 if __name__ == '__main__':
     parser = ArgumentParser(description='Extract features from images.')
@@ -24,7 +26,8 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     extractors = [
-        ColorFeature
+        ColorFeature,
+        HistogramFeature
     ]
 
     image = load(args.filename)

@@ -41,8 +41,7 @@ if __name__ == '__main__':
         help='Directory to download images into; gets created if not exists')
     args = parser.parse_args()
 
-    if args.directory.endswith('<query>'):
-        args.directory = args.directory[:-7] + args.query
+    args.directory = args.directory.replace('<query>', args.query)
 
     ensure_directory(args.directory)
     urls = google_images(args.query, args.pages)

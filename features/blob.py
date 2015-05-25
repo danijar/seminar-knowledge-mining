@@ -23,6 +23,8 @@ class BlobFeature(Feature):
     def extract(self):
         blobs = skimage.feature.blob_doh(self.image_gray,
             min_sigma=self.min_size, max_sigma=self.max_size)
+        if not len(blobs):
+            return [0, 0, 0, 0]
         amount = min(len(blobs), self.max_amount) / self.max_amount
         sizes = blobs[:,2] / self.max_size
         return [

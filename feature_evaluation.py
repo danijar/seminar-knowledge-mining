@@ -13,8 +13,11 @@ def get_statistics_of_folder(directory):
             continue
         print('  Image', filename)
         image = load(os.path.join(directory, filename))
-        features = get_feature_vector(image)
-        vectors.append(features)
+        try:
+            features = get_feature_vector(image)
+            vectors.append(features)
+        except:
+            print('Error extracting feature vector')
     # No valid images to extract feature from
     if not vectors:
         return None
@@ -54,11 +57,15 @@ if __name__ == '__main__':
     parser.add_argument('directory',
         help='Path to the directory containing folders for each class that \
         contain the images')
-    parser.add_argument('-m', '--means', default='means.csv',
+    parser.add_argument('-m', '--means', default='<directory>/means.csv',
         help='Filename of the CSV file mean values will be written to')
-    parser.add_argument('-v', '--variances', default='variances.csv',
+    parser.add_argument('-v', '--variances',
+        default='<directory>/variances.csv',
         help='Filename of the CSV file variance values will be written to')
     args = parser.parse_args()
+
+    args.means = args.means.replace('<directory>', args.directory)
+    args.variances = args.variances.replace('<directory>', args.directory)
 
     names = get_feature_names()
     classes, means, variances = get_statistics_of_folders(args.directory)

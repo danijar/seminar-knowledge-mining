@@ -1,4 +1,5 @@
 import numpy as np
+import skimage.data
 from argparse import ArgumentParser
 from helper.image import load, show
 from features.color import ColorFeature
@@ -7,15 +8,27 @@ from features.blob import BlobFeature
 from features.gradient import GradientFeature
 
 
-def apply_extractors(image, extractors):
+def get_extractors():
+    return [
+        ColorFeature,
+        HistogramFeature,
+        BlobFeature,
+        GradientFeature
+    ]
+
+def get_feature_vector(image):
+    return list(apply_extractors(image, get_extractors()))
+
+def get_feature_names():
+    dummy_image = skimage.data.astronaut()
     names = []
-    features = []
+    for extractor in get_extractors():
+        names += extractor(dummy_image).names()
+    return names
+
+def apply_extractors(image, extractors):
     for extractor in extractors:
-        instance = extractor(image)
-        names += list(instance.names())
-        features += list(instance.extract())
-    assert len(names) == len(features)
-    return names, features
+        yield from extractor(image).extract()
 
 def validate_feature_range(names, features):
     for name, feature in zip(names, features):
@@ -27,22 +40,17 @@ def print_features(names, features):
         print('{name: <25} {feature: >8.4f}'.format(**locals()))
 
 if __name__ == '__main__':
-    parser = ArgumentParser(description='Extract features from images.')
+    parser = ArgumentParser(description='Extract feature vector of an image.')
     parser.add_argument('filename',
         help='Path to the image to extract features from')
     args = parser.parse_args()
 
-    extractors = [
-        ColorFeature,
-        HistogramFeature,
-        BlobFeature,
-        GradientFeature
-    ]
-
     image = load(args.filename)
     # show(image)
+    # BlobFeature(image).show()
     # GradientFeature(image).show()
 
-    names, features = apply_extractors(image, extractors)
+    names = get_feature_names()
+    features = get_feature_vector(image)
     validate_feature_range(names, features)
     print_features(names, features)

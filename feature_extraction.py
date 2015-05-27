@@ -16,10 +16,10 @@ def get_extractors():
         GradientFeature
     ]
 
-def get_feature_vector(image):
+def feature_vector(image):
     return list(apply_extractors(image, get_extractors()))
 
-def get_feature_names():
+def feature_names():
     dummy_image = skimage.data.astronaut()
     names = []
     for extractor in get_extractors():
@@ -50,7 +50,7 @@ if __name__ == '__main__':
     # BlobFeature(image).show()
     # GradientFeature(image).show()
 
-    names = get_feature_names()
-    features = get_feature_vector(image)
+    names = feature_names()
+    features = feature_vector(image)
     validate_feature_range(names, features)
     print_features(names, features)

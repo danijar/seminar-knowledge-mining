@@ -2,36 +2,21 @@ import os
 import numpy as np
 from argparse import ArgumentParser
 from helper.image import load
-from feature_extraction import get_feature_vector, get_feature_names
+from helper.dataset import read_features
+from feature_extraction import feature_names
 
 
-def get_statistics_of_folder(directory):
-    vectors = []
-    for filename in next(os.walk(directory))[2]:
-        # Only jpg support for now
-        if not filename.endswith('.jpg'):
-            continue
-        print('  Image', filename)
-        image = load(os.path.join(directory, filename))
-        try:
-            features = get_feature_vector(image)
-            vectors.append(features)
-        except:
-            print('Error extracting feature vector')
-    # No valid images to extract feature from
-    if not vectors:
-        return None
-    # Numpy has convenient functions to collect statistics
-    vectors = np.array(vectors)
-    return vectors.mean(axis=0).tolist(), vectors.var(axis=0).tolist()
+def class_statistics(directory):
+    filenames, features = read_features(directory)
+    features = np.array(features)
+    return features.mean(axis=0).tolist(), features.var(axis=0).tolist()
 
-def get_statistics_of_folders(root):
+def dataset_statistics(root):
     classes = []
     means = []
     variances = []
     for directory in next(os.walk(root))[1]:
-        print('Directory', directory)
-        statistics = get_statistics_of_folder(os.path.join(root, directory))
+        statistics = class_statistics(os.path.join(root, directory))
         # Skip empty folders
         if not statistics:
             continue
@@ -67,7 +52,7 @@ if __name__ == '__main__':
     args.means = args.means.replace('<directory>', args.directory)
     args.variances = args.variances.replace('<directory>', args.directory)
 
-    names = get_feature_names()
-    classes, means, variances = get_statistics_of_folders(args.directory)
+    names = feature_names()
+    classes, means, variances = dataset_statistics(args.directory)
     output_csv(args.means, classes, names, means)
     output_csv(args.variances, classes, names, variances)

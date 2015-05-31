@@ -7,6 +7,7 @@ from sklearn.metrics import confusion_matrix
 from argparse import ArgumentParser
 from helper.download import ensure_directory
 from helper.dataset import read_dataset
+from extraction import feature_names
 
 
 def print_headline(text):

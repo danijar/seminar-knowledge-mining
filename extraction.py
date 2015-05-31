@@ -28,7 +28,10 @@ def feature_names():
 
 def apply_extractors(image, extractors):
     for extractor in extractors:
-        yield from extractor(image).extract()
+        features = extractor(image).extract()
+        # TODO: Why do we need to dissolve the generator here?
+        features = list(features)
+        yield from features
 
 def validate_feature_range(names, features):
     for name, feature in zip(names, features):
@@ -38,6 +41,7 @@ def print_features(names, features):
     print(len(names), 'features extracted:')
     for name, feature in zip(names, features):
         print('{name: <25} {feature: >8.4f}'.format(**locals()))
+
 
 if __name__ == '__main__':
     parser = ArgumentParser(description='Extract feature vector of an image.')

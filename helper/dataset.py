@@ -10,17 +10,8 @@ def print_headline(text):
 def read_images(directory):
     print_headline('Class ' + os.path.basename(directory))
     for filename in next(os.walk(directory))[2]:
-        supported = ('jpg', 'jpg', 'bmp', 'png', 'gif', 'svg', 'ico')
-        supported = tuple('.' + x for x in supported)
-        if not filename.lower().endswith(supported):
-            print('Skipped', filename)
-            continue
         print('Image', filename)
-        try:
-            image = load(os.path.join(directory, filename))
-        except:
-            print('Error opening image')
-            continue
+        image = load(os.path.join(directory, filename))
         yield filename, image
 
 def read_features(directory):

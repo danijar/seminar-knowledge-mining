@@ -30,13 +30,27 @@ def preprocess(image):
     image = skimage.exposure.rescale_intensity(image, in_range=ignore_extrema)
     return image
 
+def is_supported(filename):
+    supported = ('jpg', 'jpeg', 'bmp', 'png', 'gif', 'svg', 'ico')
+    supported = tuple('.' + x for x in supported)
+    if not filename.lower().endswith(supported):
+        return False
+    return True
+
 def load(filename):
-    # Open with Pillow for color mode conversion
-    image = Image.open(filename)
-    image = ensure_rgb(image)
-    image = convert_to_array(image)
-    image = preprocess(image)
-    return image
+    if not is_supported(filename):
+        print('Skipped', filename)
+        return None
+    try:
+        # Open with Pillow for color mode conversion
+        image = Image.open(filename)
+        image = ensure_rgb(image)
+        image = convert_to_array(image)
+        image = preprocess(image)
+        return image
+    except:
+        print('Error opening image')
+        return None
 
 def show(image):
     matplotlib.pyplot.figure()

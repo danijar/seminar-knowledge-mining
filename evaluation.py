@@ -3,7 +3,7 @@ import numpy as np
 from argparse import ArgumentParser
 from helper.image import load
 from helper.dataset import read_features
-from feature_extraction import feature_names
+from extraction import feature_names
 
 
 def class_statistics(directory):

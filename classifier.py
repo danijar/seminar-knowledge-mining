@@ -3,6 +3,7 @@ import numpy as np
 from sklearn.cross_validation import train_test_split
 from sklearn.multiclass import OneVsRestClassifier
 from sklearn.svm import LinearSVC
+from sklearn.metrics import confusion_matrix
 from argparse import ArgumentParser
 from helper.download import ensure_directory
 from helper.dataset import read_dataset
@@ -31,7 +32,7 @@ def copy_classified(output, paths, classes):
 if __name__ == '__main__':
     parser = ArgumentParser(description='Learning algorithm used to classify \
         images.')
-    parser.add_argument('-d', '--data',
+    parser.add_argument('data',
         help='Path to the directory containing the images to learn from and \
         validate against; sub directory for each class expected')
     parser.add_argument('-s', '--split', default=0.25,
@@ -56,6 +57,8 @@ if __name__ == '__main__':
     print('Test set size', test_target.shape[0])
     print('Feature vector length', train_data.shape[1])
     # Use model to make predictions
-    predict_target = classifier.predict(test_data)
-    compare_target(predict_target, test_target)
+    predicted = classifier.predict(test_data)
+    compare_target(predicted, test_target)
+    print(confusion_matrix(test_target, predicted))
+    print(classes)
     #copy_classified(args.output, filenames, classes)

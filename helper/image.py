@@ -25,9 +25,12 @@ def preprocess(image):
     # Force scale to size
     nearest = 0
     image = skimage.transform.resize(image, (128, 128), order=nearest)
+    assert image.shape == (128, 128, 3)
     # Scale contrast range
     ignore_extrema = (np.percentile(image, 2), np.percentile(image, 98))
-    image = skimage.exposure.rescale_intensity(image, in_range=ignore_extrema)
+    # Auto contrast if more than one color
+    if len(np.unique(image)) > 1:
+        image = skimage.exposure.rescale_intensity(image, in_range=ignore_extrema)
     return image
 
 def is_supported(filename):

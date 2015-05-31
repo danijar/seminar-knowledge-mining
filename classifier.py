@@ -1,7 +1,7 @@
 import os, shutil
 import numpy as np
 from sklearn.cross_validation import train_test_split
-from sklearn.multiclass import OneVsRestClassifier
+from sklearn.ensemble import RandomForestClassifier
 from sklearn.svm import LinearSVC
 from sklearn.metrics import classification_report
 from argparse import ArgumentParser
@@ -9,11 +9,8 @@ from helper.download import ensure_directory
 from helper.dataset import read_dataset
 from extraction import feature_names
 from helper.plot import plot_confusion_matrix
+from helper.plot import print_headline
 
-
-def print_headline(text):
-    underline = '-' * len(text)
-    print('\n' + text + '\n' + underline)
 
 def split_dataset(data, target):
     train_data, test_data, train_target, test_target = train_test_split(data, target)
@@ -23,6 +20,10 @@ def split_dataset(data, target):
     print('Feature vector length', train_data.shape[1])
     return train_data, test_data, train_target, test_target
 
+def print_scores(labels, predicted, classes):
+    scores = classification_report(labels, predicted, target_names=classes)
+    print(scores)
+
 def copy_predicted(output, paths, classes):
     map(classes, ensure_directory)
     for index, path in enumerate(paths):
@@ -30,11 +31,7 @@ def copy_predicted(output, paths, classes):
         destination = os.path.join(output, basename)
         shutil.copyfile(path, destination)
 
-def print_scores(labels, predicted, classes):
-    scores = classification_report(labels, predicted, target_names=classes)
-    print(scores)
-
-def train_and_predict(root, class_weight=False):
+def train_and_predict(root):
     # Read dataset
     filenames, data, target, classes = read_dataset(root)
     # Convert to numpy arrays and split
@@ -42,10 +39,8 @@ def train_and_predict(root, class_weight=False):
     target = np.array(target)
     train_data, test_data, train_target, test_target = split_dataset(data, target)
     # Create an train classifier
-    args = {}
-    if class_weight:
-        args['class_weight'] = 'auto'
-    classifier = OneVsRestClassifier(LinearSVC(**args))
+    trees=100
+    classifier = RandomForestClassifier(n_estimators=trees)
     classifier.fit(train_data, train_target)
     # Use model to make predictions
     predicted = classifier.predict(test_data)

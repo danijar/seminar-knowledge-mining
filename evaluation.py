@@ -1,39 +1,30 @@
-import os
 import numpy as np
 from argparse import ArgumentParser
-from helper.image import load
-from helper.dataset import read_features
 from extraction import feature_names
+from sklearn.feature_selection import chi2
+from helper.dataset import read_dataset
+from helper.plot import print_headline
 
 
-def class_statistics(directory):
-    filenames, features = read_features(directory)
-    features = np.array(features)
-    return features.mean(axis=0).tolist(), features.var(axis=0).tolist()
+def print_chi(names, data, target):
+    chi_values, _ = chi2(data, target)
+    print('Feature                       chi2')
+    print('-------                       ----')
+    for x in zip(names, chi_values):
+        print('{: <25} {: >8.4f}'.format(*x))
 
-def dataset_statistics(root):
-    classes = []
-    means = []
-    variances = []
-    for directory in next(os.walk(root))[1]:
-        statistics = class_statistics(os.path.join(root, directory))
-        # Skip empty folders
-        if not statistics:
-            continue
-        classes.append(directory)
-        mean, variance = statistics
-        means.append(mean)
-        variances.append(variance)
-    return classes, means, variances
+def write_chi(filename, names, data, target):
+    chi_values, _ = chi2(data, target)
+    captions = ('Feature', 'chi2')
+    data = (names, chi_values)
+    write_csv(filename, captions, data)
 
-def output_csv(filename, classes, names, statistics):
-    statistics = np.rollaxis(np.array(statistics), 1)
+def write_csv(filename, captions, data):
+    assert len(captions) == len(data)
     with open(filename, 'w') as csv:
-        csv.write('feature,')
-        csv.write(','.join(classes) + '\n')
-        for i, name in enumerate(names):
-            csv.write(name + ',')
-            csv.write(','.join(map(str, statistics[i])) + '\n')
+        csv.write(','.join(captions) + '\n')
+        for row in range(len(data[0])):
+            csv.write(','.join(str(column[row]) for column in data) + '\n')
 
 
 if __name__ == '__main__':
@@ -42,17 +33,15 @@ if __name__ == '__main__':
     parser.add_argument('directory',
         help='Path to the directory containing folders for each class that \
         contain the images')
-    parser.add_argument('-m', '--means', default='<directory>/means.csv',
-        help='Filename of the CSV file mean values will be written to')
-    parser.add_argument('-v', '--variances',
-        default='<directory>/variances.csv',
-        help='Filename of the CSV file variance values will be written to')
+    parser.add_argument('-o', '--output', default='<directory>/chi2.csv',
+        help='Filename of the CSV file where scores will be written to')
     args = parser.parse_args()
 
-    args.means = args.means.replace('<directory>', args.directory)
-    args.variances = args.variances.replace('<directory>', args.directory)
+    args.output = args.output.replace('<directory>', args.directory)
 
     names = feature_names()
-    classes, means, variances = dataset_statistics(args.directory)
-    output_csv(args.means, classes, names, means)
-    output_csv(args.variances, classes, names, variances)
+    filenames, data, target, classes = read_dataset(args.directory)
+    print_chi(names, data, target)
+    write_chi(args.output, names, data, target)
+    print('')
+    print('Wrote CSV table to', args.output)

@@ -3,6 +3,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
+def print_headline(text):
+    underline = '-' * len(text)
+    print('\n' + text + '\n' + underline)
+
 def plot_confusion_matrix(labels, predicted, classes):
     confusion = confusion_matrix(labels, predicted)
     # Normalize range

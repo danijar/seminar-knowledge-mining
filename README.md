@@ -44,3 +44,29 @@ each list. Run `pip install <path-to-file>` on each of those.
 
 4. Install remaining dependencies inside your virtual environment using `pip
 install -r requirements.txt`.
+
+Workflows
+---------
+
+### Data set
+
+1. Download DBpedia dump
+2. Extract list of image names
+3. Fetch image and meta data of random entries
+4. Manually label data
+5. Balance amount of image per class
+
+### Training
+
+1. Proprocess data set
+2. Extract image and text based features
+3. Train classifier
+
+### Suggesting article images
+
+1. Get user search term
+2. Query DBpedia for related images based on description
+3. Fetch image and meta data of first results
+4. Extract image and text based features
+5. Use trained classifier to predict class
+6. Filter against user's class selection

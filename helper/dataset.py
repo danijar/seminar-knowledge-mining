@@ -16,7 +16,11 @@ def read_images(directory):
             print('Skipped', filename)
             continue
         print('Image', filename)
-        image = load(os.path.join(directory, filename))
+        try:
+            image = load(os.path.join(directory, filename))
+        except:
+            print('Error opening image')
+            continue
         yield filename, image
 
 def read_features(directory):

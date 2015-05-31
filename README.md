@@ -9,15 +9,18 @@ Set up instructions
 1. Install these dependencies by using your system's package manager if you
 don't have them already.
 
-    | Depdendency |   Debian package   |    Arch package   |
-    | ----------- | ------------------ | ----------------- |
-    | Python 3    | python3            | python            |
-    | Pip         | python3-pip        | python-pip        |
-    | Virtualenv  | python3-virtualenv | python-virtualenv |
-    | Cython      | cython3            | cython            |
-    | Fortran     | gfortran           | gcc-fortran       |
-    | Blas        | libblas-dev        | blas              |
-    | Lapack      | liblapack-dev      | lapack            |
+    | Depdendency |  Debian package  |    Arch package   |
+    | ----------- | ---------------- | ----------------- |
+    | Python 3    | python3          | python            |
+    | Cython      | cython3          | cython            |
+    | Pip         | python3-pip      | python-pip        |
+    | Virtualenv  | virtualenv       | python-virtualenv |
+    | Fortran     | gfortran         | gcc-fortran       |
+    | Blas        | libblas-dev      | blas              |
+    | Lapack      | liblapack-dev    | lapack            |
+    | PNG         | libpng-dev       | libpng            |
+    | JPEG        | libjpeg8-dev     | libjpeg-turbo     |
+    | Freetype    | libfreetype6-dev | freetype2         |
 
 2. Create a virtual environment inside the repository root by runnning
 `virtualenv .` or if you have multiple Python versions `virtualenv -p python3

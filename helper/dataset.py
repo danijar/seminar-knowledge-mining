@@ -23,12 +23,12 @@ def read_features(directory):
     filenames = []
     data = []
     for filename, image in read_images(directory):
-        #try:
-        features = feature_vector(image)
-        filenames.append(os.path.join(directory, filename))
-        data.append(features)
-        #except:
-        #    print('Error extracting feature vector')
+        try:
+            features = feature_vector(image)
+            filenames.append(os.path.join(directory, filename))
+            data.append(features)
+        except:
+            print('Error extracting feature vector')
     # No valid images to extract feature from
     if not data:
         return None

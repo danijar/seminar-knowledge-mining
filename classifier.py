@@ -48,14 +48,14 @@ if __name__ == '__main__':
     data = np.array(data)
     target = np.array(target)
     train_data, test_data, train_target, test_target = train_test_split(data, target)
-    # Create an train classifier
-    classifier = OneVsRestClassifier(LinearSVC())
-    classifier.fit(train_data, train_target)
     # Print some measures
     print_headline('Results')
     print('Training set size', train_target.shape[0])
     print('Test set size', test_target.shape[0])
     print('Feature vector length', train_data.shape[1])
+    # Create an train classifier
+    classifier = OneVsRestClassifier(LinearSVC())
+    classifier.fit(train_data, train_target)
     # Use model to make predictions
     predicted = classifier.predict(test_data)
     compare_target(predicted, test_target)

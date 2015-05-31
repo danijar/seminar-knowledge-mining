@@ -18,7 +18,8 @@ def convert_to_array(image):
     """
     Convert Pillow image to Numpy array used by scikit
     """
-    return np.asarray(image, dtype=np.uint8)
+    image = np.asarray(image, dtype=np.uint8)
+    return image
 
 def preprocess(image):
     # Force scale to size
@@ -34,10 +35,8 @@ def load(filename):
     image = Image.open(filename)
     image = ensure_rgb(image)
     image = convert_to_array(image)
+    image = preprocess(image)
     return image
-    #if len(image.shape) < 3:
-    #    image = image[:,:,np.newaxis]
-    #    image = np.repeat(image, 3, axis=2)
 
 def show(image):
     matplotlib.pyplot.figure()

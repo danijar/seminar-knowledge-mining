@@ -7,16 +7,18 @@ from helper.plot import print_headline
 
 
 def print_chi(names, data, target):
-    chi_values, _ = chi2(data, target)
-    print('Feature                       chi2')
-    print('-------                       ----')
-    for x in zip(names, chi_values):
+    _, p_values = chi2(data, target)
+    p_values = [1 - x for x in p_values]
+    print('Feature                    p-value')
+    print('-------                    -------')
+    for x in zip(names, p_values):
         print('{: <25} {: >8.4f}'.format(*x))
 
 def write_chi(filename, names, data, target):
-    chi_values, _ = chi2(data, target)
-    captions = ('Feature', 'chi2')
-    data = (names, chi_values)
+    _, p_values = chi2(data, target)
+    p_values = [1 - x for x in p_values]
+    captions = ('Feature', 'p-value')
+    data = (names, p_values)
     write_csv(filename, captions, data)
 
 def write_csv(filename, captions, data):
@@ -33,13 +35,14 @@ if __name__ == '__main__':
     parser.add_argument('directory',
         help='Path to the directory containing folders for each class that \
         contain the images')
-    parser.add_argument('-o', '--output', default='<directory>/chi2.csv',
-        help='Filename of the CSV file where scores will be written to')
+    parser.add_argument('-o', '--output', default='<directory>/p-values.csv',
+        help='Filename of the CSV file where p-values will be written to')
     args = parser.parse_args()
 
     args.output = args.output.replace('<directory>', args.directory)
 
     names = feature_names()
+    print('')
     filenames, data, target, classes = read_dataset(args.directory)
     print_chi(names, data, target)
     write_chi(args.output, names, data, target)

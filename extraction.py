@@ -30,7 +30,6 @@ def get_inputs(filename):
     args['image'] = image
     args['gray']     = skimage.color.rgb2gray(image)
     args['channels'] = np.rollaxis(image, 2)
-    args['pixels']   = image.reshape(-1, image.shape[-1])
     # Define images as write only since they're shared between extractors
     for name in args:
         if args[name] is np.ndarray:

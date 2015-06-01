@@ -48,6 +48,8 @@ def load(filename):
         # Open with Pillow for color mode conversion
         image = Image.open(filename)
         image = ensure_rgb(image)
+        max_size = 512, 512
+        image.thumbnail(max_size)
         image = convert_to_array(image)
         return image
     except:

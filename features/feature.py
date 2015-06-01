@@ -8,7 +8,7 @@ class Feature:
         # Allow empty creation for calling names()
         if not kwargs:
             return
-        expected = ('image', 'original', 'gray', 'channels', 'pixels', 'filename')
+        expected = ('image', 'original', 'gray', 'channels', 'filename')
         assert set(kwargs.keys()) == set(expected)
         self.__dict__.update(kwargs)
 

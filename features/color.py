@@ -6,6 +6,7 @@ class ColorFeature(Feature):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.pixels = self.original.reshape(-1, self.original.shape[-1])
 
     @classmethod
     def names(cls):

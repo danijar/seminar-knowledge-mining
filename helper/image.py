@@ -2,17 +2,28 @@ import skimage.io
 import skimage.transform
 import skimage.exposure
 import numpy as np
-import matplotlib.pyplot
 from PIL import Image
+from helper.plot import plot_image
 
 
 def ensure_rgb(image):
     """
     Ensure consistent color format with three color channels
     """
+    if image.mode == 'RGBA':
+        image = fill_alpha(image)
     if image.mode != 'RGB':
         image = image.convert('RGB')
     return image
+
+def fill_alpha(image, color=(255, 255, 255)):
+    data = np.array(image)
+    r, g, b, a = np.rollaxis(data, axis=-1)
+    r[a == 0] = color[0]
+    g[a == 0] = color[1]
+    b[a == 0] = color[2]
+    data = np.dstack([r, g, b, a])
+    return Image.fromarray(data, 'RGBA')
 
 def convert_to_array(image):
     """

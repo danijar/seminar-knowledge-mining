@@ -21,7 +21,9 @@ class ColorFeature(Feature):
         yield from self.variances()
 
     def amount(self):
-        return len(np.unique(self.pixels)) / len(self.pixels)
+        relative = len(np.unique(self.pixels)) / 255
+        clamped = min(relative, 1)
+        return clamped
 
     def means(self):
         return [x.mean() for x in self.channels]

@@ -1,33 +1,20 @@
 import os
 from helper.image import load
-from extraction import feature_vector
+from extraction import feature_vector, feature_names
+from helper.plot import print_headline
 
 
-def print_headline(text):
-    underline = '-' * len(text)
-    print('\n' + text + '\n' + underline)
-
-def read_images(directory):
+def read_features(directory):
+    vector_length = len(feature_names())
     print_headline('Class ' + os.path.basename(directory))
     for filename in next(os.walk(directory))[2]:
         print('Image', filename)
-        image = load(os.path.join(directory, filename))
-        yield filename, image
-
-def read_features(directory):
-    filenames = []
-    data = []
-    for filename, image in read_images(directory):
         try:
-            features = feature_vector(image)
-            filenames.append(os.path.join(directory, filename))
-            data.append(features)
+            features = feature_vector(os.path.join(directory, filename))
+            assert len(features) == vector_length
+            yield filename, features
         except:
             print('Error extracting feature vector')
-    # No valid images to extract feature from
-    if not data:
-        return None
-    return filenames, data
 
 def read_dataset(root):
     filenames = []
@@ -35,13 +22,10 @@ def read_dataset(root):
     target = []
     classes = []
     for directory in next(os.walk(root))[1]:
-        result = read_features(os.path.join(root, directory))
-        if not result:
-            continue
-        names, features = result
-
-        filenames += names
-        data += features
-        target += [len(classes)] * len(features)
+        new_class = len(classes)
+        for filename, features in read_features(os.path.join(root, directory)):
+            filenames.append(filename)
+            data.append(features)
+            target.append(new_class)
         classes.append(directory)
     return filenames, data, target, classes

@@ -49,13 +49,7 @@ def load(filename):
         image = Image.open(filename)
         image = ensure_rgb(image)
         image = convert_to_array(image)
-        image = preprocess(image)
         return image
     except:
         print('Error opening image')
         return None
-
-def show(image):
-    matplotlib.pyplot.figure()
-    skimage.io.imshow(image)
-    skimage.io.show()

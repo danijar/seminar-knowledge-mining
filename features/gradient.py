@@ -1,20 +1,22 @@
 import skimage.feature
 import numpy as np
 from .feature import Feature
-from helper.image import load, show
+from helper.image import load
+from helper.plot import plot_image
 
 
 class GradientFeature(Feature):
+    bins = 8
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.bins = 8
 
-    def names(self):
-        yield from self.multiple_names('gradient', self.bins)
+    @classmethod
+    def names(cls):
+        yield from cls.multiple_names('gradient', cls.bins)
 
     def extract(self):
-        flat = skimage.feature.hog(self.image_gray, orientations=self.bins)
+        flat = skimage.feature.hog(self.gray, orientations=self.bins)
         cells = flat.reshape(len(flat) / self.bins, self.bins)
         histogram = [0] * self.bins
         for cell in cells:
@@ -26,6 +28,6 @@ class GradientFeature(Feature):
         return histogram
 
     def show(self):
-        _, visualization = skimage.feature.hog(self.image_gray,
+        _, visualization = skimage.feature.hog(self.gray,
             orientations=self.bins, visualise=True)
-        show(visualization)
+        plot_image(visualization)

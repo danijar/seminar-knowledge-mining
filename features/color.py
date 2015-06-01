@@ -7,7 +7,8 @@ class ColorFeature(Feature):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-    def names(self):
+    @classmethod
+    def names(cls):
         yield 'color_distinct_amount'
         rgb = 'red', 'green', 'blue'
         yield from ['color_mean_' + x for x in rgb]

@@ -2,7 +2,6 @@ import os, shutil
 import numpy as np
 from sklearn.cross_validation import train_test_split
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.svm import LinearSVC
 from sklearn.metrics import classification_report
 from argparse import ArgumentParser
 from helper.download import ensure_directory

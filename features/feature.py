@@ -4,19 +4,16 @@ import skimage.color
 
 class Feature:
 
-    def __init__(self, image):
-        # Provide useful formats of the image data to sub classes
-        self.image = image
-        self.image_gray = skimage.color.rgb2gray(self.image)
-        self.channels = np.rollaxis(self.image, 2)
-        self.pixels = self.image.reshape(-1, self.image.shape[-1])
-        # Pixel data is shared between extractors
-        self.image.setflags(write=False)
-        self.image_gray.setflags(write=False)
-        self.channels.setflags(write=False)
-        self.pixels.setflags(write=False)
+    def __init__(self, **kwargs):
+        # Allow empty creation for calling names()
+        if not kwargs:
+            return
+        expected = ('image', 'original', 'gray', 'channels', 'pixels', 'filename')
+        assert set(kwargs.keys()) == set(expected)
+        self.__dict__.update(kwargs)
 
-    def names(self):
+    @classmethod
+    def names(cls):
         raise NotImplementedError
 
     def extract(self):
@@ -25,7 +22,11 @@ class Feature:
     def show(self):
         raise NotImplementedError
 
-    def multiple_names(self, name, amount):
+    @staticmethod
+    def multiple_names(name, amount):
+        """
+        Helper function to generate a range of names with the numbers from 0 to
+        amount being appended.
+        """
         for i in range(amount):
             yield '{}_{}'.format(name, i)
-

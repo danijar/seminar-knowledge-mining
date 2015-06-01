@@ -7,6 +7,11 @@ def print_headline(text):
     underline = '-' * len(text)
     print('\n' + text + '\n' + underline)
 
+def plot_image(image):
+    plt.figure()
+    plt.imshow(image, interpolation='none')
+    plt.show()
+
 def plot_confusion_matrix(labels, predicted, classes):
     confusion = confusion_matrix(labels, predicted)
     # Normalize range

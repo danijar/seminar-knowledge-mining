@@ -4,15 +4,16 @@ from .feature import Feature
 
 
 class HistogramFeature(Feature):
+    bins = 5
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.hsv = skimage.color.rgb2hsv(self.image)
-        self.bins = 5
 
-    def names(self):
+    @classmethod
+    def names(cls):
         for name in ['hue', 'saturation', 'value']:
-            yield from self.multiple_names('histogram_' + name, self.bins)
+            yield from cls.multiple_names('histogram_' + name, cls.bins)
 
     def extract(self):
         for i in range(3):

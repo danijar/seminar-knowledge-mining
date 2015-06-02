@@ -1,8 +1,22 @@
 import os
+import csv
+import constants
 from helper.image import load
 from extraction import feature_vector, feature_names
 from helper.plot import print_headline
 
+
+def read_filenames(filename):
+    filenames = []
+    try:
+        with open(filename) as csvfile:
+            next(csvfile, None)
+            reader = csv.reader(csvfile, delimiter=constants.CSV_DELIMITER, quotechar='|')
+            for row in reader:
+                filenames.append(row[0])
+    except:
+        print('Error reading from csv file.')
+    return filenames
 
 def read_features(directory):
     vector_length = len(feature_names())

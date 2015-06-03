@@ -1,6 +1,7 @@
 import math
 import re
 
+
 def to_filename(url):
     filename = safe_characters((url.split('/')[-1]).split(':')[-1])
     return filename

@@ -1,16 +1,31 @@
 import shutil
 import os
 import json
-import constants
 from urllib.request import urlopen
-from helper.sparql import to_resource_uri, get_resource
+from helper.sparql import to_resource_uri, get_resource, FILE_URL
 from helper.format import to_filename
 
 METADATA_EXTENSION = '.meta'
 DATA_FOLDER = 'data/'
 
+
 def get_data_path(path):
-    return constants.DATA_FOLDER + path
+    return DATA_FOLDER + path
+
+def download_all(urls, properties, directory):
+    """
+    Downloads metadata properties and image files for given urls
+    """
+    for url in urls:
+        if not url:
+            continue
+        if file_exists(url, directory):
+            print('Skipping already downloaded file:', url)
+            continue
+        metadata = download_metadata(url, properties, directory)
+        if not metadata:
+            continue
+        image = download_file(metadata[FILE_URL], directory)
 
 def download_metadata(url, properties, directory):
     try:
@@ -70,4 +85,3 @@ def dump(dictionary, file):
         json.dump(dictionary, open(file, 'w+'))
     except:
         print('Could not write to' + file)
-

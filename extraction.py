@@ -7,7 +7,7 @@ from features.color import ColorFeature
 from features.histogram import HistogramFeature
 from features.blob import BlobFeature
 from features.gradient import GradientFeature
-
+#from features.face import FaceFeature
 
 def get_extractors():
     return [
@@ -15,6 +15,7 @@ def get_extractors():
         HistogramFeature,
         BlobFeature,
         GradientFeature
+        #FaceFeature
     ]
 
 def get_inputs(filename):

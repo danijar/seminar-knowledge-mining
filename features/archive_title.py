@@ -1,6 +1,7 @@
 from .string_feature import StringFeature
 from helper.format import strip_digits
 
+
 class ArchiveTitleFeature(StringFeature):
 
     predicate = 'http://commons.dbpedia.org/property/archiveTitle'

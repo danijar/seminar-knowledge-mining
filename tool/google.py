@@ -30,6 +30,7 @@ def google_images(query, pages):
         for result in results:
             yield result['url']
 
+
 if __name__ == '__main__':
     parser = ArgumentParser(description='Download Google image search ' \
         'results.')

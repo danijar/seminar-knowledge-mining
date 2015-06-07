@@ -16,6 +16,7 @@ def images_in_article(url):
         img = wrapper.find('img', recursive=False)
         yield 'http:' + img.get('src')
 
+
 if __name__ == '__main__':
     parser = ArgumentParser(description='Download random images from ' \
         'random Wikipedia articles.')

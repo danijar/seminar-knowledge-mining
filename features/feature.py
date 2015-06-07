@@ -1,13 +1,6 @@
-import numpy as np
-import skimage.color
-
-
 class Feature:
 
     def __init__(self, **kwargs):
-        # Allow empty creation for calling names()
-        if not kwargs:
-            return
         expected = ('image', 'original', 'gray', 'channels', 'filename')
         assert set(kwargs.keys()) == set(expected)
         self.__dict__.update(kwargs)

@@ -1,3 +1,4 @@
+# TODO: Store in JSON format, upload to drive and remove from repository
 vocabulary = {
     'chart': ['chart', 'diagram'],
     'cover': ['plakat', 'einband', 'albumcover', 'titelbild'],

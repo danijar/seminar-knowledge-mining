@@ -1,5 +1,5 @@
 import numpy as np
-from argparse import ArgumentParser
+from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
 from extraction import feature_names
 from sklearn.feature_selection import chi2
 from helper.dataset import read_dataset
@@ -31,7 +31,8 @@ def write_csv(filename, captions, data):
 
 if __name__ == '__main__':
     parser = ArgumentParser(description='Measure statistics of features \
-        within the images of the same class to evaluate features.')
+        within the images of the same class to evaluate features.',
+        formatter_class=ArgumentDefaultsHelpFormatter)
     parser.add_argument('directory',
         help='Path to the directory containing folders for each class that \
         contain the images')

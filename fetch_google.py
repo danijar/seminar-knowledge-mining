@@ -1,6 +1,7 @@
 import json
-from urllib.request import Request, urlopen, quote_plus
-from argparse import ArgumentParser
+from urllib.request import Request, urlopen
+from urllib.parse import quote_plus
+from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
 from helper.download import ensure_directory, download_files
 
 
@@ -32,8 +33,8 @@ def google_images(query, pages):
 
 
 if __name__ == '__main__':
-    parser = ArgumentParser(description='Download Google image search ' \
-        'results.')
+    parser = ArgumentParser(description='Download Google image search \
+        results.', formatter_class=ArgumentDefaultsHelpFormatter)
     parser.add_argument('-q', '--query', required=True,
         help='Search term')
     parser.add_argument('-p', '--pages', type=int, default=8,

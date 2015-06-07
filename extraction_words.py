@@ -4,8 +4,8 @@ from pprint import pprint
 from helper.format import is_nan
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.ensemble import RandomForestClassifier
-from features.label import LabelFeature
-from features.archive_title import ArchiveTitleFeature
+from feature.label import LabelFeature
+from feature.archive_title import ArchiveTitleFeature
 
 
 def get_words_features():

@@ -1,6 +1,6 @@
 from urllib.request import urlopen
 from bs4 import BeautifulSoup
-from argparse import ArgumentParser
+from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
 from helper.download import ensure_directory, download_files, safe_characters
 
 
@@ -18,8 +18,9 @@ def images_in_article(url):
 
 
 if __name__ == '__main__':
-    parser = ArgumentParser(description='Download random images from ' \
-        'random Wikipedia articles.')
+    parser = ArgumentParser(description='Download random images from random \
+        Wikipedia articles.',
+        formatter_class=ArgumentDefaultsHelpFormatter)
     parser.add_argument('-n', '--count', type=int, default=20,
         help='Rough amount of images to download')
     parser.add_argument('-d', '--directory', default='data/wikipedia',

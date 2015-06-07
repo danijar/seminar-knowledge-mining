@@ -1,13 +1,13 @@
 import numpy as np
 import skimage.data
-from argparse import ArgumentParser
+from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
 from helper.image import load, preprocess
 from helper.plot import plot_image
-from features.color import ColorFeature
-from features.histogram import HistogramFeature
-from features.blob import BlobFeature
-from features.gradient import GradientFeature
-#from features.face import FaceFeature
+from feature.color import ColorFeature
+from feature.histogram import HistogramFeature
+from feature.blob import BlobFeature
+from feature.gradient import GradientFeature
+
 
 def get_extractors():
     return [
@@ -15,7 +15,6 @@ def get_extractors():
         HistogramFeature,
         BlobFeature,
         GradientFeature
-        #FaceFeature
     ]
 
 def get_inputs(filename):
@@ -68,7 +67,8 @@ def print_features(names, features):
 
 
 if __name__ == '__main__':
-    parser = ArgumentParser(description='Extract feature vector of an image.')
+    parser = ArgumentParser(description='Extract feature vector of an image.',
+        formatter_class=ArgumentDefaultsHelpFormatter)
     parser.add_argument('filename',
         help='Path to the image to extract features from')
     args = parser.parse_args()

@@ -3,7 +3,7 @@ import numpy as np
 from sklearn.cross_validation import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import classification_report
-from argparse import ArgumentParser
+from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
 from helper.download import ensure_directory
 from helper.dataset import read_dataset
 from extraction import feature_names
@@ -48,7 +48,8 @@ def train_and_predict(root):
 
 if __name__ == '__main__':
     parser = ArgumentParser(description='Learning algorithm used to classify \
-        images.')
+        images.',
+        formatter_class=ArgumentDefaultsHelpFormatter)
     parser.add_argument('data',
         help='Path to the directory containing the images to learn from and \
         validate against; sub directory for each class expected')

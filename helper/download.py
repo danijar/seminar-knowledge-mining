@@ -1,18 +1,25 @@
 import shutil
 import os
-import json
+import re
 from urllib.request import urlopen
-from helper.sparql import to_resource_uri, get_resource, FILE_URL
-from helper.format import to_filename
+from urllib.parse import urlsplit, urlunsplit, quote
 
 
 def get_filename(url):
     return safe_characters(url.split('/')[-1])
 
+def encode_uri(uri):
+    chunks = list(urlsplit(uri))
+    chunks[2] = quote(chunks[2])
+    uri = urlunsplit(chunks)
+    return uri
+
 def download_file(url, directory):
+    ensure_directory(directory)
     basename = get_filename(url)
-    print('Download:', basename)
     filename = os.path.join(directory, basename)
+    url = encode_uri(url)
+    print('Download image:', basename)
     with urlopen(url) as response, open(filename, 'wb') as file_:
         shutil.copyfileobj(response, file_)
 

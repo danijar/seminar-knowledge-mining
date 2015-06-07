@@ -1,4 +1,3 @@
-import constants
 from SPARQLWrapper import SPARQLWrapper, JSON
 
 DBPEDIA_COMMONS = 'http://commons.dbpedia.org/sparql'
@@ -41,11 +40,10 @@ def get_filenames(keywords, number):
     try:
         json = query_filenames(keywords, number)
         filenames = parse_filenames(json)
-        print('Result set size:', len(filenames))
         return filenames
     except:
         print('Could not get filesnames for keywords:', keywords)
-        return False
+    return False
 
 def query_resource(resource):
     query = """SELECT DISTINCT ?s ?p ?o WHERE {{
@@ -69,8 +67,7 @@ def get_resource(resource, properties):
     try:
         json = query_resource(resource)
         properties = parse_resource(json, properties)
-        print('Result set size:', len(properties))
         return properties
     except:
         print('Could not get resource:', resource)
-        return False
+    return False

@@ -1,16 +1,14 @@
-from .string_feature import StringFeature
+from .feature import Feature
 
-class GeoLocationFeature(StringFeature):
 
-    predicate = 'http://www.w3.org/2003/01/geo/wgs84_pos#lat'
+class GeoLocationFeature(Feature):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
     def extract(self):
-        if not self.string:
-            return 0
-        return 1
+        return int(self.lat and self.long)
 
-    def preprocess(self):
-        return
+    @classmethod
+    def names(cls):
+        return ['geo_location']

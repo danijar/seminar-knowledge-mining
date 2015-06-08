@@ -1,8 +1,6 @@
-import numpy as np
-import skimage.data
 from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
-from helper.image import load, preprocess
 from helper.plot import plot_image
+from helper.preprocess import get_inputs
 from feature.color import ColorFeature
 from feature.histogram import HistogramFeature
 from feature.blob import BlobFeature
@@ -16,27 +14,6 @@ def get_extractors():
         BlobFeature,
         GradientFeature
     ]
-
-def get_inputs(filename):
-    """
-    Return kwargs containing different image versions and DBpedia meta data
-    needed to construct feature extractors.
-    """
-    args = {}
-    # Image inputs
-    original = load(filename)
-    image = preprocess(original)
-    args['original'] = original
-    args['image'] = image
-    args['gray']     = skimage.color.rgb2gray(image)
-    args['channels'] = np.rollaxis(image, 2)
-    # Define images as write only since they're shared between extractors
-    for name in args:
-        if args[name] is np.ndarray:
-            args[name].setflags(write=False)
-    # Textual data
-    args['filename'] = filename
-    return args
 
 def feature_vector(filename):
     inputs = get_inputs(filename)

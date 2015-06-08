@@ -1,7 +1,4 @@
 import os
-import csv
-import constants
-from helper.image import load
 from extraction import feature_vector, feature_names
 from helper.plot import print_headline
 
@@ -10,6 +7,9 @@ def read_features(directory):
     vector_length = len(feature_names())
     print_headline('Class ' + os.path.basename(directory))
     for filename in next(os.walk(directory))[2]:
+        # Skip metadata files
+        if filename.endswith('.json'):
+            continue
         print('Image', filename)
         try:
             features = feature_vector(os.path.join(directory, filename))

@@ -1,7 +1,8 @@
 class Feature:
 
     def __init__(self, **kwargs):
-        expected = ('image', 'original', 'gray', 'channels', 'filename')
+        expected = ('image', 'original', 'gray', 'channels', 'filename', 'url',
+            'extension', 'title', 'description', 'lat', 'long')
         assert set(kwargs.keys()) == set(expected)
         self.__dict__.update(kwargs)
 

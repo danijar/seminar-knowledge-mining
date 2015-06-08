@@ -57,12 +57,12 @@ def fetch_metadata(uri):
     return metadata
 
 def fetch_properties(resource, properties):
-    #try:
+    try:
         data = query_properties(resource)
         properties = parse_properties(data, properties)
         return properties
-    #except:
-    #    print('Error retrieving', resource.strip('<>'))
+    except:
+        print('Error retrieving', resource.strip('<>'))
 
 def query_properties(resource):
     query = """SELECT DISTINCT ?s ?p ?o WHERE {{
@@ -72,7 +72,6 @@ def query_properties(resource):
     return result
 
 def parse_properties(data, predicates):
-    #print(data)
     properties = {x: '' for x in predicates}
     for result in data['results']['bindings']:
         predicate = result['p']['value']
@@ -84,6 +83,6 @@ def execute_query(query):
     sparql = SPARQLWrapper('http://commons.dbpedia.org/sparql')
     sparql.setQuery(query)
     sparql.setReturnFormat(JSON)
-    sparql.setTimeout(300)  # TODO: Does this mean 5 seconds?
+    sparql.setTimeout(300)  # 5 minutes
     data = sparql.query().convert()
     return data

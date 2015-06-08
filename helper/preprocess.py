@@ -35,13 +35,12 @@ def get_metadata(filename):
     Given an image filename, load it's metadata from the related JSON file.
     """
     filename = replace_extension(filename, 'json')
-    print('Metadata', filename)
     try:
         with open(filename) as file_:
             metadata = json.load(file_)
             return metadata
     except:
-        print('No medata found for', filename)
+        print('Medata not found', filename)
         keys = ('title', 'long', 'description', 'url', 'lat', 'extension')
         return {key: '' for key in keys}
 

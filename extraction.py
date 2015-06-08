@@ -5,7 +5,8 @@ from feature.color import ColorFeature
 from feature.histogram import HistogramFeature
 from feature.blob import BlobFeature
 from feature.gradient import GradientFeature
-from feature.geo_location import GeoLocationFeature
+from feature.geo import GeoFeature
+from feature.format import FormatFeature
 
 
 def get_extractors():
@@ -14,7 +15,8 @@ def get_extractors():
         HistogramFeature,
         BlobFeature,
         GradientFeature,
-        GeoLocationFeature
+        GeoFeature,
+        FormatFeature
     ]
 
 def feature_vector(filename):

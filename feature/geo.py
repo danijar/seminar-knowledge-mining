@@ -1,17 +1,17 @@
 from .feature import Feature
 
 
-class GeoLocationFeature(Feature):
+class GeoFeature(Feature):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
     def extract(self):
         if self.lat and self.long:
-            return [1]
+            yield 1
         else:
-            return [0]
+            yield 0
 
     @classmethod
     def names(cls):
-        return ['geo_location']
+        yield 'geo'

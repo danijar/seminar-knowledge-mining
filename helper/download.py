@@ -14,12 +14,13 @@ def encode_uri(uri):
     uri = urlunsplit(chunks)
     return uri
 
-def download_file(url, directory):
+def download_file(url, directory, log=True):
     ensure_directory(directory)
     basename = get_filename(url)
     filename = os.path.join(directory, basename)
     url = encode_uri(url)
-    print('Download image:', basename)
+    if log:
+        print('Download image:', basename)
     with urlopen(url) as response, open(filename, 'wb') as file_:
         shutil.copyfileobj(response, file_)
 

@@ -29,31 +29,7 @@ def print_headline(text):
     underline = '-' * len(text)
     print('\n' + text + '\n' + underline)
 
-def print_bars():
-    bars = '='.join(['' for i in range(0, 20)])
-    print('\n' + bars + '\n')
-
-def dumpclean(obj):
-    if type(obj) == list:
-        for v in obj:
-            if hasattr(v, '__iter__'):
-                dumpclean(v)
-            else:
-                print(v)
-    elif type(obj) == dict:
-        for k, v in obj.items():
-            if hasattr(v, '__iter__'):
-                print(k + '\n')
-                print_bars()
-                dumpclean(v)
-            else:
-                print('%s : %s' % (k, v))
-    else:
-        print(obj)
-
-def print_report(stats):
-    print_bars()
-    print('Report')
-    print_bars()
-    dumpclean(stats)
-    print_bars()
+def remove_prefix(text, prefix):
+    if text.startswith(prefix):
+        return text[len(prefix):]
+    return text

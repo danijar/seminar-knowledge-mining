@@ -44,13 +44,7 @@ def parse_uris(json):
     for result in json['results']['bindings']:
         yield result['s']['value']
 
-def remove_prefix(text, prefix):
-    if text.startswith(prefix):
-        return text[len(prefix):]
-    return text
-
 def fetch_metadata(uri):
-    print('Fetch metadata:', remove_prefix(os.path.basename(uri), 'File:'))
     resource = '<{}>'.format(uri)
     # Download all properties from the global METADATA dictionary
     metadata = fetch_properties(resource, list(METADATA.values()))

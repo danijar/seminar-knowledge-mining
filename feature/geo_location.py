@@ -7,7 +7,10 @@ class GeoLocationFeature(Feature):
         super().__init__(*args, **kwargs)
 
     def extract(self):
-        return int(self.lat and self.long)
+        if self.lat and self.long:
+            return [1]
+        else:
+            return [0]
 
     @classmethod
     def names(cls):

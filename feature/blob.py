@@ -17,8 +17,7 @@ class BlobFeature(Feature):
         return [
             'blob_amount',
             'blob_size_mean',
-            'blob_size_variance',
-            'blob_size_median'
+            'blob_size_variance'
         ]
 
     def extract(self):
@@ -28,12 +27,9 @@ class BlobFeature(Feature):
             return [0, 0, 0, 0]
         amount = min(len(blobs), self.max_amount) / self.max_amount
         sizes = blobs[:,2] / self.max_size
-        return [
-            amount,
-            sizes.mean(),
-            sizes.var(),
-            np.median(sizes)
-        ]
+        yield amount
+        yield sizes.mean()
+        yield sizes.var()
 
     def show(self):
         fig, ax = pyplot.subplots(1, 1)

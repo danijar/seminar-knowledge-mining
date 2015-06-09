@@ -6,9 +6,8 @@ class ColorFeature(Feature):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        source = self.original
-        self.pixels = source.reshape(-1, source.shape[-1])
-        self.channels = np.rollaxis(source, 2)
+        self.pixels = self.image.reshape(-1, self.image.shape[-1])
+        self.channels = np.rollaxis(self.original, 2)
 
     @classmethod
     def names(cls):

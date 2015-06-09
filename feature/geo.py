@@ -14,4 +14,4 @@ class GeoFeature(Feature):
 
     @classmethod
     def names(cls):
-        yield 'geo'
+        yield 'geo_exists'

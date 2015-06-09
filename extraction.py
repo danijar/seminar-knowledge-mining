@@ -7,6 +7,7 @@ from feature.blob import BlobFeature
 from feature.gradient import GradientFeature
 from feature.geo import GeoFeature
 from feature.format import FormatFeature
+from feature.external import ExternalFeature
 
 
 def get_extractors():
@@ -16,7 +17,8 @@ def get_extractors():
         BlobFeature,
         GradientFeature,
         GeoFeature,
-        FormatFeature
+        FormatFeature,
+        ExternalFeature
     ]
 
 def feature_vector(filename):

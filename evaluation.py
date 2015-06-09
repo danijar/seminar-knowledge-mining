@@ -18,10 +18,13 @@ def compute_chi(data, target):
 
 def print_chi(names, data, target):
     chi_values, p_values = compute_chi(data, target)
-    print('Feature                       chi2  p-value')
-    print('------------------------- -------- --------')
-    for x in zip(names, chi_values, p_values):
-        print('{: <25} {: >8.4f} {: >8.4f}'.format(*x))
+    chi_values_sqrt = np.sqrt(chi_values)
+    max_chi_sqrt = max(chi_values_sqrt)
+    print('Feature                         chi2    p-value chi       ')
+    print('------------------------- ---------- ---------- ----------')
+    for x in zip(names, chi_values, p_values, chi_values_sqrt):
+        bar = '#' * (10 * x[3] / max_chi_sqrt) if not np.isnan(x[3]) else ''
+        print('{: <25} {: >10.4f} {: >10.4f}'.format(*x), bar)
 
 def write_chi(filename, names, data, target):
     chi_values, p_values = compute_chi(data, target)

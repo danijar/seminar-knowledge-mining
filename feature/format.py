@@ -1,4 +1,5 @@
 from .feature import Feature
+from helper.image import get_supported
 
 
 class FormatFeature(Feature):
@@ -7,13 +8,11 @@ class FormatFeature(Feature):
         super().__init__(*args, **kwargs)
 
     def extract(self):
-        formats = ['jpg', 'jpeg', 'png']
-        try:
-            value = formats.index(self.extension) + 1
-            yield value
-        except:
-            yield 0
+        supported = get_supported()
+        assert self.extension in supported
+        for extension in supported:
+            yield 1 if self.extension == extension else 0
 
     @classmethod
     def names(cls):
-        yield 'format'
+        return ['format_' + x for x in get_supported()]

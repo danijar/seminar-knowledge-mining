@@ -44,9 +44,11 @@ def preprocess(image):
         image = skimage.exposure.rescale_intensity(image, in_range=ignore_extrema)
     return image
 
+def get_supported():
+    return ('jpg', 'jpeg', 'bmp', 'png', 'gif', 'svg', 'ico')
+
 def is_supported(filename):
-    supported = ('jpg', 'jpeg', 'bmp', 'png', 'gif', 'svg', 'ico')
-    supported = tuple('.' + x for x in supported)
+    supported = tuple('.' + x for x in get_supported())
     if not filename.lower().endswith(supported):
         return False
     return True

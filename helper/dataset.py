@@ -1,32 +1,37 @@
 import os
 import json
+import sys
 import numpy as np
 from extraction import feature_vector, feature_names
-from helper.plot import print_headline
+from helper.image import is_supported
+from helper.text import print_headline
 from sklearn.preprocessing import StandardScaler
 
 
 def read_features(directory):
     vector_length = len(feature_names())
-    print_headline('Class ' + os.path.basename(directory))
-    for filename in next(os.walk(directory))[2]:
-        # Skip metadata files
-        if filename.endswith('.json'):
-            continue
-        print('Image', filename)
+    print_headline('Class: ' + os.path.basename(directory))
+    count = 0
+    for filename in walk_images(directory):
         try:
             features = feature_vector(os.path.join(directory, filename))
             assert len(features) == vector_length
+            # Display progress
+            print('Process {: <40}'.format(filename), flush=True, end='\r')
+            count += 1
             yield filename, features
+        except KeyboardInterrupt:
+            sys.exit(1)
         except:
-            print('Error extracting feature vector')
+            print('Error extracting features from', filename)
+    print('Loaded {} images'.format(count).ljust(48) + '\n')
 
 def read_dataset(root):
     filenames = []
     data = []
     target = []
     classes = []
-    for directory in next(os.walk(root))[1]:
+    for directory in walk_directories(root):
         new_class = len(classes)
         for filename, features in read_features(os.path.join(root, directory)):
             filenames.append(filename)
@@ -34,6 +39,19 @@ def read_dataset(root):
             target.append(new_class)
         classes.append(directory)
     return filenames, data, target, classes
+
+def walk_directories(root):
+    return next(os.walk(root))[1]
+
+def walk_images(directory):
+    """
+    Generator of filenames of all supported images files in the directory.
+    """
+    filenames = next(os.walk(directory))[2]
+    for filename in filenames:
+        if is_supported(filename):
+            yield filename
+
 
 def normalize(data, directory=None, load=False):
 

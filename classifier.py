@@ -8,7 +8,7 @@ from helper.download import ensure_directory
 from helper.dataset import read_dataset, normalize
 from extraction import feature_names
 from helper.plot import plot_confusion_matrix
-from helper.plot import print_headline
+from helper.text import print_headline
 
 
 def split_dataset(data, target):

@@ -3,7 +3,7 @@ from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
 from extraction import feature_names
 from sklearn.feature_selection import chi2
 from helper.dataset import read_dataset, normalize
-from helper.plot import print_headline
+from helper.text import print_headline
 
 
 def compute_chi(data, target):

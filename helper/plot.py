@@ -24,13 +24,3 @@ def plot_confusion_matrix(labels, predicted, classes):
     plt.ylabel('True label')
     plt.xlabel('Predicted label')
     plt.show()
-
-# TODO: Move to helper/test.py
-def print_headline(text):
-    underline = '-' * len(text)
-    print('\n' + text + '\n' + underline)
-
-def remove_prefix(text, prefix):
-    if text.startswith(prefix):
-        return text[len(prefix):]
-    return text

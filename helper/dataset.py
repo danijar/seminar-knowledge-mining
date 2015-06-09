@@ -42,7 +42,7 @@ class Dataset:
             self.classes = content['classes']
             self.filenames = content['filenames']
         self._assert_length()
-        print('Loaded dataset from', filename)
+        print('Loaded dataset with ', len(self.target), ' samples from', filename)
 
     def save(self, filename):
         content = {}
@@ -52,19 +52,20 @@ class Dataset:
         content['filenames'] = self.filenames
         with open(filename, 'w') as file_:
             json.dump(content, file_)
-            print('Saved dataset to', filename)
+            print('Saved dataset with ', len(self.target), ' samples to', filename)
 
-    def split(self, split=0.25):
+    def split(self, split=0.25, log=True):
         """
         Return two new Dataset instances containing the training data and
         testing data. Filenames are not stored in the new instances.
         """
         splitted = train_test_split(self.data, self.target, test_size=split)
         train_data, test_data, train_target, test_target = splitted
-        print_headline('Dataset Split')
-        print('Training set size', train_target.shape[0])
-        print('Test set size', test_target.shape[0])
-        print('Feature vector length', train_data.shape[1])
+        if log:
+            print_headline('Dataset Split')
+            print('Training set size', train_target.shape[0])
+            print('Test set size', test_target.shape[0])
+            print('Feature vector length', train_data.shape[1])
         training = Dataset(train_data, train_target, self.classes)
         testing = Dataset(test_data, test_target, self.classes)
         return training, testing
@@ -75,6 +76,7 @@ class Dataset:
         external one. In the second case, both means and stds must be provided.
         """
         scaler = StandardScaler()
+        assert (means is None) == (stds is None)
         if means and stds:
             scaler.mean_ = np.array(means)
             scaler.std_ = np.array(stds)
@@ -92,14 +94,14 @@ class Dataset:
                 features = feature_vector(os.path.join(directory, filename))
                 assert len(features) == vector_length
                 # Display progress
-                print('Process {: <40}'.format(filename), flush=True, end='\r')
+                print('Process {: <50}'.format(filename), flush=True, end='\r')
                 count += 1
                 yield filename, features
             except KeyboardInterrupt:
                 sys.exit(1)
             except:
                 print('Error extracting features from', filename)
-        print('Loaded {} images'.format(count).ljust(48))
+        print('Loaded {} images'.format(count).ljust(58))
 
     def _walk_directories(self, root):
         return next(os.walk(root))[1]

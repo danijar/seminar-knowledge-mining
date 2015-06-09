@@ -5,7 +5,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import classification_report
 from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
 from helper.download import ensure_directory
-from helper.dataset import read_dataset
+from helper.dataset import read_dataset, normalize
 from extraction import feature_names
 from helper.plot import plot_confusion_matrix
 from helper.plot import print_headline
@@ -37,9 +37,11 @@ def train_and_predict(root):
     data = np.array(data)
     target = np.array(target)
     train_data, test_data, train_target, test_target = split_dataset(data, target)
+    # Normalize dataset
+    train_data = normalize(train_data, root)
+    test_data = normalize(test_data, root, load=True)
     # Create an train classifier
-    trees=100
-    classifier = RandomForestClassifier(n_estimators=trees)
+    classifier = RandomForestClassifier(n_estimators=100)
     classifier.fit(train_data, train_target)
     # Use model to make predictions
     predicted = classifier.predict(test_data)

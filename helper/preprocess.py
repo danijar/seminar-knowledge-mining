@@ -23,7 +23,6 @@ def get_visual(filename):
     args['original'] = original
     args['image']    = image
     args['gray']     = skimage.color.rgb2gray(image)
-    args['channels'] = np.rollaxis(image, 2)
     # Define images as write only since they're shared between extractors
     for name in args:
         if args[name] is np.ndarray:

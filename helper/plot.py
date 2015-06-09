@@ -25,6 +25,7 @@ def plot_confusion_matrix(labels, predicted, classes):
     plt.xlabel('Predicted label')
     plt.show()
 
+# TODO: Move to helper/test.py
 def print_headline(text):
     underline = '-' * len(text)
     print('\n' + text + '\n' + underline)

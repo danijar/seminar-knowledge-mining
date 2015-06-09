@@ -1,6 +1,9 @@
 import os
+import json
+import numpy as np
 from extraction import feature_vector, feature_names
 from helper.plot import print_headline
+from sklearn.preprocessing import StandardScaler
 
 
 def read_features(directory):
@@ -31,3 +34,38 @@ def read_dataset(root):
             target.append(new_class)
         classes.append(directory)
     return filenames, data, target, classes
+
+def normalize(data, directory=None, load=False):
+
+    FILENAME = 'normalization.json'
+
+    def _load(scaler, directory):
+        assert directory
+        filename = os.path.join(directory, FILENAME)
+        try:
+            with open(filename, 'r') as file_:
+                params = json.load(file_)
+                scaler.mean_ = np.array(params['means'])
+                scaler.std_ = np.array(params['stds'])
+        except:
+            print('Could not load normalization parameters from', filename)
+            sys.exit(1)
+
+    def _store(scaler, directory):
+        filename = os.path.join(directory, FILENAME)
+        params = {
+            'means': scaler.mean_.tolist(),
+            'stds': scaler.std_.tolist()
+        }
+        with open(filename, 'w') as file_:
+            json.dump(params, file_)
+
+    scaler = StandardScaler()
+    if load:
+        _load(scaler, directory)
+    else:
+        scaler.fit(data)
+        if directory:
+            _store(scaler, directory)
+    data = scaler.transform(data)
+    return data

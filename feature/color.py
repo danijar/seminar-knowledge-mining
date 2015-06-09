@@ -6,7 +6,9 @@ class ColorFeature(Feature):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.pixels = self.original.reshape(-1, self.original.shape[-1])
+        source = self.original
+        self.pixels = source.reshape(-1, source.shape[-1])
+        self.channels = np.rollaxis(source, 2)
 
     @classmethod
     def names(cls):
@@ -21,9 +23,7 @@ class ColorFeature(Feature):
         yield from self.variances()
 
     def amount(self):
-        relative = len(np.unique(self.pixels)) / 255
-        clamped = min(relative, 1)
-        return clamped
+        return len(np.unique(self.pixels))
 
     def means(self):
         return [x.mean() for x in self.channels]

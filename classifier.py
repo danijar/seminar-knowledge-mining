@@ -1,68 +1,92 @@
 import os, shutil
 import numpy as np
-from sklearn.cross_validation import train_test_split
+import matplotlib.pyplot as plt
+from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import classification_report
-from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
+from sklearn.metrics import confusion_matrix
 from helper.download import ensure_directory
-from helper.dataset import read_dataset, normalize
-from extraction import feature_names
-from helper.plot import plot_confusion_matrix
+from helper.dataset import Dataset
 from helper.text import print_headline
 
 
-def split_dataset(data, target):
-    train_data, test_data, train_target, test_target = train_test_split(data, target)
-    print_headline('Results')
-    print('Training set size', train_target.shape[0])
-    print('Test set size', test_target.shape[0])
-    print('Feature vector length', train_data.shape[1])
-    return train_data, test_data, train_target, test_target
+class Prediction:
 
-def print_scores(labels, predicted, classes):
-    scores = classification_report(labels, predicted, target_names=classes)
-    print(scores)
+    def __init__(self, true=None, predicted=None, classes=None):
+        self.true = true
+        self.predicted = predicted
+        self.classes = classes
 
-def copy_predicted(output, paths, classes):
-    map(classes, ensure_directory)
-    for index, path in enumerate(paths):
-        basename = os.path.basename(path)
-        destination = os.path.join(output, basename)
-        shutil.copyfile(path, destination)
+    def print_scores(self):
+        print_headline('Results')
+        scores = classification_report(self.true, self.predicted,
+            target_names=self.classes)
+        print(scores)
 
-def train_and_predict(root):
-    # Read dataset
-    filenames, data, target, classes = read_dataset(root)
+    def plot_confusion_matrix(self):
+        confusion = confusion_matrix(self.true, self.predicted)
+        # Normalize range
+        confusion = confusion.astype('float') / confusion.sum(axis=1)[:, np.newaxis]
+        # Create figure
+        plt.figure()
+        plt.imshow(confusion, interpolation='nearest', cmap=plt.cm.Blues)
+        plt.title('Confusion matrix')
+        plt.colorbar()
+        tick_marks = np.arange(len(self.classes))
+        plt.xticks(tick_marks, self.classes, rotation=45)
+        plt.yticks(tick_marks, self.classes)
+        plt.tight_layout()
+        plt.ylabel('True label')
+        plt.xlabel('Predicted label')
+        plt.show()
+
+
+def train_and_predict(dataset, split):
     # Convert to numpy arrays and split
-    data = np.array(data)
-    target = np.array(target)
-    train_data, test_data, train_target, test_target = split_dataset(data, target)
+    training, testing = dataset.split(split)
     # Normalize dataset
-    train_data = normalize(train_data, root)
-    test_data = normalize(test_data, root, load=True)
+    params = training.normalize()
+    # TODO: Store params
+    testing.normalize(params)
     # Create an train classifier
-    classifier = RandomForestClassifier(n_estimators=100)
-    classifier.fit(train_data, train_target)
+    classifier = RandomForestClassifier(n_estimators=1000)
+    classifier.fit(training.data, training.target)
     # Use model to make predictions
-    predicted = classifier.predict(test_data)
-    return test_target, predicted, classes
+    predicted = classifier.predict(testing.data)
+    prediction = Prediction(testing.target, predicted, testing.classes)
+    return prediction
 
 
 if __name__ == '__main__':
     parser = ArgumentParser(description='Learning algorithm used to classify \
         images.',
         formatter_class=ArgumentDefaultsHelpFormatter)
-    parser.add_argument('data',
+    parser.add_argument('data', nargs='?',
         help='Path to the directory containing the images to learn from and \
         validate against; sub directory for each class expected')
-    parser.add_argument('-s', '--split', default=0.25,
+    parser.add_argument('-t', '--test-set', default=0.25,
         help='Fraction of data used for validation')
+    parser.add_argument('-s', '--save',
+        help='Filename of JSON file to store extracted features and classes \
+        to; can be loaded with --load')
+    parser.add_argument('-l', '--load',
+        help='Filename of JSON file to load extracted features and classes \
+        from; mutually exclusive with positional argument data')
     parser.add_argument('-o', '--output', default='data/predicted',
         help='Folder to copy predicted images into; sub directories for all \
         classes are created')
     args = parser.parse_args()
 
-    labels, predicted, classes = train_and_predict(args.data)
-    print_scores(labels, predicted, classes)
-    #plot_confusion_matrix(labels, predicted, classes)
-    #copy_predicted(args.output, filenames, classes)
+    dataset = Dataset()
+    if args.load:
+        print_headline('Dataset dump')
+        dataset.load(args.load)
+    else:
+        dataset.read(args.data)
+    if args.save:
+        print_headline('Dataset dump')
+        dataset.save(args.save)
+
+    prediction = train_and_predict(dataset, args.test_set)
+    prediction.print_scores()
+    prediction.plot_confusion_matrix()

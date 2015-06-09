@@ -14,10 +14,11 @@ def encode_uri(uri):
     uri = urlunsplit(chunks)
     return uri
 
-def download_file(url, directory, log=True):
+def download_file(url, directory, filename=None, log=True):
     ensure_directory(directory)
     basename = get_filename(url)
-    filename = os.path.join(directory, basename)
+    if not filename:
+        filename = os.path.join(directory, basename)
     url = encode_uri(url)
     if log:
         print('Download image:', basename)

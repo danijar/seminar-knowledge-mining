@@ -6,20 +6,26 @@ from feature.histogram import HistogramFeature
 from feature.blob import BlobFeature
 from feature.gradient import GradientFeature
 from feature.geo import GeoFeature
-from feature.format import FormatFeature
-from feature.external import ExternalFeature
+from feature.extension import ExtensionFeature
+from feature.size import SizeFeature
 
 
-def get_extractors():
-    return [
-        ColorFeature,
-        HistogramFeature,
-        BlobFeature,
-        GradientFeature,
-        GeoFeature,
-        FormatFeature,
-        ExternalFeature
-    ]
+def get_extractors(visual=True, textual=False):
+    extractors = []
+    if visual:
+        extractors += [
+            ColorFeature,
+            HistogramFeature,
+            BlobFeature,
+            GradientFeature
+        ]
+    if textual:
+        extractors += [
+            GeoFeature,
+            ExtensionFeature,
+            SizeFeature
+        ]
+    return extractors
 
 def feature_vector(filename):
     inputs = get_inputs(filename)

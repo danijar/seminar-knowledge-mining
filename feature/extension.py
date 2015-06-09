@@ -2,7 +2,7 @@ from .feature import Feature
 from helper.image import get_supported
 
 
-class FormatFeature(Feature):
+class ExtensionFeature(Feature):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -15,4 +15,4 @@ class FormatFeature(Feature):
 
     @classmethod
     def names(cls):
-        return ['format_' + x for x in get_supported()]
+        return ['extension_' + x for x in get_supported()]

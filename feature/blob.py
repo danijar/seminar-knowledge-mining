@@ -8,7 +8,6 @@ class BlobFeature(Feature):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.max_amount = 100
         self.min_size = 3
         self.max_size = 30
 
@@ -24,10 +23,9 @@ class BlobFeature(Feature):
         blobs = skimage.feature.blob_doh(self.gray,
             min_sigma=self.min_size, max_sigma=self.max_size)
         if not len(blobs):
-            return [0, 0, 0, 0]
-        amount = min(len(blobs), self.max_amount) / self.max_amount
-        sizes = blobs[:,2] / self.max_size
-        yield amount
+            return [0, 0, 0]
+        sizes = blobs[:,2]
+        yield len(blobs)
         yield sizes.mean()
         yield sizes.var()
 

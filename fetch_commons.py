@@ -1,9 +1,9 @@
 import os
 import json
+import uuid
 from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
 from helper.download import ensure_directory, get_filename, download_file
 from helper.dbpedia import fetch_uris, fetch_metadata
-from helper.plot import remove_prefix
 
 
 def read_uris(filename):
@@ -19,19 +19,27 @@ def images_and_metadata(uris, directory):
         if not metadata or not metadata['description']:
             print('Skip image without description')
             continue
-        url = metadata['url']
         try:
-            download_file(url, directory, log=False)
-            store_metadata(metadata, directory)
+            identifier = str(uuid.uuid4())
+            store_metadata(metadata, directory, identifier)
+            store_image(metadata['url'], directory, identifier)
         except:
             print('Error downloading image')
 
-def store_metadata(metadata, directory):
-    url = metadata['url']
-    filename = get_filename(url) + '.json'
-    filename = os.path.join(directory, filename)
+def store_metadata(metadata, directory, identifier):
+    filename = os.path.join(directory, identifier + '.json')
     with open(filename, 'w') as file_:
         json.dump(metadata, file_)
+
+def store_image(url, directory, identifier):
+    extension = url.split('.')[-1].lower()
+    filename = os.path.join(directory, identifier + '.' + extension)
+    download_file(url, directory, filename, log=False)
+
+def remove_prefix(text, prefix):
+    if text.startswith(prefix):
+        return text[len(prefix):]
+    return text
 
 
 if __name__ == '__main__':

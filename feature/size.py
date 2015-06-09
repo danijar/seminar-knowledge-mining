@@ -1,7 +1,7 @@
 from .feature import Feature
 
 
-class ExternalFeature(Feature):
+class SizeFeature(Feature):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

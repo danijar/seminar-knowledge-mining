@@ -1,42 +1,74 @@
 from .feature import Feature
+from sklearn.feature_extraction.text import CountVectorizer
 
 
-VOCABULARY = {
-    'chart':      ['chart', 'diagram'],
-    'cover':      ['plakat', 'einband', 'albumcover', 'titelbild'],
-    'document':   ['titelseite', 'urkunde', 'dokument', 'document'],
-    'drawn':      ['drawn', 'sketch', 'zeichnung', 'drawing'],
-    'flag':       ['flag', 'flagge'],
-    'icon':       ['symbol', 'icon'],
-    'logo':       ['logo', 'marke', 'brand'],
-    'map':        ['map', 'karte', 'atlas'],
-    'object':     ['single', 'einzeln', 'piece', 'exemplar', 'gegenstand', 'object'],
-    'painting':   ['painting', 'gemälde', 'canvas', 'composition'],
-    'portrait':   ['portrait', 'person', 'face'],
-    'scenery':    ['scenery', 'scape', 'szene', 'scene'],
-    'scheme':     ['scheme', 'figure', 'abbildung', 'sketch', 'blueprint'],
-    'screenshot': ['screenshot'],
+SYNONYMS = {
+    'chart':         ['chart', 'diagram'],
+    'document':      ['document', 'scan'],
+    'drawn':         ['drawn', 'sketch'],
+    'embellishment': ['embellishment'],
+    'flag':          ['flag', 'state'],
+    'icon':          ['icon', 'pictogram'],
+    'landscape':     ['landscape', 'view', 'mountains'],
+    'logo':          ['logo', 'coat', 'arms'],
+    'map':           ['map', 'country'],
+    'object':        ['object'],
+    'painting':      ['painting', 'art'],
+    'portrait':      ['portrait', 'face'],
+    'sample':        ['sample'],
+    'scenery':       ['scenery', 'situation', 'people'],
+    'scheme':        ['scheme', 'figure', 'flow', 'schematic'],
+    'sign':          ['sign'],
 }
 
 
 class WordsFeature(Feature):
 
+    terms = []
+    term_buckets = []
+    bucket_names = []
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
     @classmethod
+    def initialize_vocabulary(cls, synonyms):
+        # Convert to list of tuples for persistent ordering
+        mapping = sorted(synonyms.items(), key=lambda x: x[0])
+        for index, (bucket, terms) in enumerate(mapping):
+            # Create plain list of all terms
+            cls.terms += terms
+            # Remember mapping to buckets and thier names
+            cls.term_buckets += [len(cls.bucket_names)] * len(terms)
+            cls.bucket_names.append(bucket)
+
+    @classmethod
+    def initialize_vectorizer(cls):
+        cls.vectorizer = CountVectorizer(
+            decode_error='replace',
+            strip_accents='unicode',
+            analyzer='word',
+            stop_words='english',
+            token_pattern=r'[A-Z]*[a-z]{2,}',
+            vocabulary=cls.terms
+        )
+
+    @classmethod
     def names(cls):
-        for key in VOCABULARY:
-            yield 'words_' + key
+        for bucket in cls.bucket_names:
+            yield 'words_' + bucket
 
     def extract(self):
-        text = ' '.join(self.url, self.title, self.description)
-        chunks = self.tokenize(text)
-        chunks = self.stemming(chunks)
-        # TODO: Use sklearn.feature_extraction.text.CountVectorizer here
+        text = ' '.join((self.url, self.title, self.description))
+        cls = type(self)
+        term_counts = cls.vectorizer.transform([text]).toarray()[0].tolist()
+        # Aggregate term counts into buckets
+        bucket_counts = [0 for _ in cls.bucket_names]
+        for term, count in enumerate(term_counts):
+            bucket = cls.term_buckets[term]
+            bucket_counts[bucket] += count
+        yield from bucket_counts
 
-    def tokenize(self, text):
-        raise NotImplementedError
 
-    def stemming(self, chunks):
-        raise NotImplementedError
+WordsFeature.initialize_vocabulary(SYNONYMS)
+WordsFeature.initialize_vectorizer()

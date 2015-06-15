@@ -22,7 +22,7 @@ def print_chi(names, dataset):
     max_chi_sqrt = max(chi_values_sqrt)
     print('')
     print('Feature                         chi2    p-value chi       ')
-    print('------------------------- ---------- ---------- ----------')
+    print('----------------------------------------------------------')
     for x in zip(names, chi_values, p_values, chi_values_sqrt):
         bar = '#' * (10 * x[3] / max_chi_sqrt) if not np.isnan(x[3]) else ''
         print('{: <25} {: >10.4f} {: >10.4f}'.format(*x), bar)
@@ -48,7 +48,7 @@ if __name__ == '__main__':
     parser.add_argument('directory',
         help='Path to the directory containing folders for each class that \
         contain the images')
-    parser.add_argument('-o', '--output', default='<directory>/p-values.csv',
+    parser.add_argument('-o', '--output', default='<directory>/evaluation.csv',
         help='Filename of the CSV file where p-values will be written to')
     args = parser.parse_args()
 

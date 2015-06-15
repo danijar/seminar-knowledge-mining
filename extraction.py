@@ -8,9 +8,10 @@ from feature.gradient import GradientFeature
 from feature.geo import GeoFeature
 from feature.extension import ExtensionFeature
 from feature.size import SizeFeature
+from feature.words import WordsFeature
 
 
-def get_extractors(visual=True, textual=False):
+def get_extractors(visual=True, textual=True):
     extractors = []
     if visual:
         extractors += [
@@ -23,7 +24,8 @@ def get_extractors(visual=True, textual=False):
         extractors += [
             GeoFeature,
             ExtensionFeature,
-            SizeFeature
+            SizeFeature,
+            WordsFeature
         ]
     return extractors
 
@@ -43,11 +45,6 @@ def feature_names():
 def apply_extractors(inputs, extractors):
     for extractor in extractors:
         yield from extractor(**inputs).extract()
-
-def validate_feature_range(names, features):
-    assert len(names) == len(features)
-    for name, feature in zip(names, features):
-        assert 0 <= feature <= 1, name + ' is not between 0 and 1'
 
 def print_features(names, features):
     print(len(names), 'features extracted:')
@@ -70,5 +67,4 @@ if __name__ == '__main__':
 
     names = feature_names()
     features = feature_vector(args.filename)
-    validate_feature_range(names, features)
     print_features(names, features)

@@ -45,7 +45,7 @@ def preprocess(image):
     return image
 
 def get_supported():
-    return ('jpg', 'jpeg', 'bmp', 'png', 'gif', 'svg', 'ico')
+    return ('jpg', 'jpeg', 'bmp', 'png', 'gif')
 
 def is_supported(filename):
     supported = tuple('.' + x for x in get_supported())

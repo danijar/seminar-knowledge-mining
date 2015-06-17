@@ -1,14 +1,19 @@
+import sys
+import os
+import io
+import numpy as np
 import skimage.io
 import skimage.transform
 import skimage.exposure
-import numpy as np
+import cairosvg
 from PIL import Image
 from helper.plot import plot_image
 
 
 def ensure_rgb(image):
     """
-    Ensure consistent color format with three color channels
+    Ensure consistent color format with three color channels. Expects PIL
+    Image as input.
     """
     if image.mode == 'RGBA':
         image = fill_alpha(image)
@@ -45,7 +50,7 @@ def preprocess(image):
     return image
 
 def get_supported():
-    return ('jpg', 'jpeg', 'bmp', 'png', 'gif')
+    return ('jpg', 'jpeg', 'bmp', 'png', 'gif', 'svg')
 
 def is_supported(filename):
     supported = tuple('.' + x for x in get_supported())
@@ -53,13 +58,28 @@ def is_supported(filename):
         return False
     return True
 
+def convert_svg(filename):
+    """
+    Converts a SVG image to PNG format and returns it as a file object.
+    """
+    assert filename.endswith('.svg')
+    basename, extension = os.path.splitext(filename)
+    png = cairosvg.svg2png(url=filename)
+    return io.BytesIO(png)
+
+def open_image(filename):
+    if filename.lower().endswith('.svg'):
+        png = convert_svg(filename)
+        return Image.open(png)
+    else:
+        return Image.open(filename)
+
 def load(filename):
     if not is_supported(filename):
         print('Skipped', filename)
         return None
     try:
-        # Open with Pillow for color mode conversion
-        image = Image.open(filename)
+        image = open_image(filename)
         image = ensure_rgb(image)
         max_size = 512, 512
         image.thumbnail(max_size)
@@ -67,4 +87,5 @@ def load(filename):
         return image
     except:
         print('Error opening image')
+        print(sys.exc_info()[0])
         return None

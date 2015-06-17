@@ -8,6 +8,7 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.naive_bayes import GaussianNB
 from sklearn.lda import LDA
+from sklearn.dummy import DummyClassifier
 
 
 def get_classifiers():
@@ -21,6 +22,8 @@ def get_classifiers():
         'LDA': LDA(),
         'Random Forest 10': RandomForestClassifier(10),
         'Random Forest 100': RandomForestClassifier(100),
+        'Dummy Classifier Random': DummyClassifier(strategy='uniform'),
+        'Dummy Classifier Weighted': DummyClassifier(strategy='stratified')
     }
 
 

@@ -1,3 +1,4 @@
+import os
 import numpy as np
 from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
 from extraction import feature_names
@@ -26,6 +27,7 @@ def print_chi(names, dataset):
     for x in zip(names, chi_values, p_values, chi_values_sqrt):
         bar = '#' * (10 * x[3] / max_chi_sqrt) if not np.isnan(x[3]) else ''
         print('{: <25} {: >10.4f} {: >10.4f}'.format(*x), bar)
+    print('')
 
 def write_chi(filename, names, dataset):
     chi_values, p_values = compute_chi(dataset)
@@ -45,19 +47,22 @@ if __name__ == '__main__':
     parser = ArgumentParser(description='Measure statistics of features \
         within the images of the same class to evaluate features.',
         formatter_class=ArgumentDefaultsHelpFormatter)
-    parser.add_argument('directory',
+    parser.add_argument('features',
         help='Path to the directory containing folders for each class that \
-        contain the images')
-    parser.add_argument('-o', '--output', default='<directory>/evaluation.csv',
-        help='Filename of the CSV file where p-values will be written to')
+        contain the images and metadata files')
+    parser.add_argument('-o', '--output', default='<folder>/evaluation.csv',
+        help='Filename of the CSV file where p-values will be written to; \
+        folder is replaced by the features folder')
     args = parser.parse_args()
 
-    args.output = args.output.replace('<directory>', args.directory)
+    folder = os.path.splitext(os.path.split(args.features)[0])[0]
+    args.output = args.output.replace('<folder>', folder)
+
+    dataset = Dataset()
+    dataset.load(args.features)
 
     names = feature_names()
-    dataset = Dataset()
-    dataset.read(args.directory)
     print_chi(names, dataset)
+    print('Write CSV table to', args.output)
     write_chi(args.output, names, dataset)
-    print('')
-    print('Wrote CSV table to', args.output)
+    print('Done')

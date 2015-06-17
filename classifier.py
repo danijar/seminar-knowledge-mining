@@ -72,33 +72,25 @@ if __name__ == '__main__':
     parser = ArgumentParser(description='Learning algorithm used to classify \
         images.',
         formatter_class=ArgumentDefaultsHelpFormatter)
-    parser.add_argument('data',
-        help='Path to the directory containing the images to learn from and \
-        validate against; sub directory for each class expected')
-    parser.add_argument('-t', '--test-set', type=float, default=0.25,
+    parser.add_argument('features',
+        help='Path to the directory containing folders for each class that \
+        contain the images and metadata files')
+    parser.add_argument('-s', '--split', type=float, default=0.25,
         help='Fraction of data used for validation')
-    parser.add_argument('-s', '--save', action='store_true', default=False,
-        help='Cache extracted features and classes inside data directory; can \
-        be loaded with --load')
-    parser.add_argument('-l', '--load', action='store_true', default=False,
-        help='Load cached features and classes to skip the extraction')
-    parser.add_argument('-o', '--output', default='data/predicted',
+    parser.add_argument('-c', '--copy-predicted',
+        default='<folder>/../<folder>-predicted/',
         help='Folder to copy predicted images into; sub directories for all \
         classes are created')
     args = parser.parse_args()
 
+    if '<folder>' in args.copy_predicted:
+        folder = os.path.splitext(args.features)[0]
+        args.copy_predicted = args.copy_predicted.replace('<folder>', folder)
+
     dataset = Dataset()
-    cached = os.path.join(args.data, 'dataset.json')
-    if args.load:
-        print_headline('Dataset dump')
-        dataset.load(cached)
-    else:
-        dataset.read(args.data)
-    if args.save:
-        print_headline('Dataset dump')
-        dataset.save(cached)
+    dataset.load(args.features)
 
     classifier = RandomForestClassifier(n_estimators=300)
-    prediction = train_and_predict(classifier, dataset, args.test_set)
+    prediction = train_and_predict(classifier, dataset, args.split)
     prediction.print_scores()
     prediction.plot_confusion_matrix()

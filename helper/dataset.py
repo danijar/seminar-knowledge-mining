@@ -4,7 +4,7 @@ import sys
 import numpy as np
 from sklearn.cross_validation import train_test_split
 from sklearn.preprocessing import StandardScaler
-from extraction import feature_vector, feature_names
+from helper.extraction import feature_vector, feature_names
 from helper.image import is_supported
 from helper.text import print_headline
 
@@ -16,6 +16,22 @@ class Dataset:
         self.target = target
         self.classes = classes
         self.filenames = filenames
+
+    def read_load_save(self, load, save, path, basename='dataset.json'):
+        assert load is bool
+        assert save is bool
+        dataset = Dataset()
+        filename = os.path.join(path, basename)
+        if load:
+            print('Load dataset from', filename, end=' ')
+            dataset.load(filename)
+            print('Done.')
+        else:
+            dataset.read(args.data)
+        if save:
+            print('Save dataset to', filename, end=' ')
+            dataset.save(filename)
+            print('Done.')
 
     def read(self, root):
         data = []
@@ -33,8 +49,10 @@ class Dataset:
         self.data = np.array(data)
         self.target = np.array(target)
         self._assert_length()
+        print('')
 
     def load(self, filename):
+        print('Load dataset from', filename)
         with open(filename, 'r') as file_:
             content = json.load(file_)
             self.data = np.array(content['data'])
@@ -42,9 +60,10 @@ class Dataset:
             self.classes = content['classes']
             self.filenames = content['filenames']
         self._assert_length()
-        print('Loaded dataset with ', len(self.target), ' samples from', filename)
+        print('Done (' + str(len(self.target)) + ')')
 
     def save(self, filename):
+        print('Save dataset with', len(self.target), 'samples to', filename)
         content = {}
         content['data'] = self.data.tolist()
         content['target'] = self.target.tolist()
@@ -52,7 +71,7 @@ class Dataset:
         content['filenames'] = self.filenames
         with open(filename, 'w') as file_:
             json.dump(content, file_)
-            print('Saved dataset with ', len(self.target), ' samples to', filename)
+        print('Done')
 
     def split(self, split=0.25, log=True):
         """

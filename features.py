@@ -1,6 +1,7 @@
 from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
 from helper.plot import plot_image
 from helper.extraction import feature_names, feature_vector
+from helper.preprocess import get_inputs
 
 
 def print_features(names, features):
@@ -15,13 +16,13 @@ if __name__ == '__main__':
     parser.add_argument('filename',
         help='Path to the image to extract features from')
     parser.add_argument('-o', '--original', action='store_true',
-        description='Whether to show the original image')
+        help='Whether to show the original image')
     parser.add_argument('-p', '--proprocessed', action='store_true',
-        description='Whether to show the proprocessed image')
+        help='Whether to show the proprocessed image')
     parser.add_argument('-b', '--blobs', action='store_true',
-        description='Whether to show the extracted blobs')
+        help='Whether to show the extracted blobs')
     parser.add_argument('-g', '--gradients', action='store_true',
-        description='Whether to show the extracted gradients')
+        help='Whether to show the extracted gradients')
     args = parser.parse_args()
 
     inputs = get_inputs(args.filename)

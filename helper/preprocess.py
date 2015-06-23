@@ -5,15 +5,17 @@ import numpy as np
 from helper.image import load, preprocess
 
 
-def get_inputs(filename):
+def get_inputs(filename, visual, textual):
     """
     Return kwargs containing different image versions and DBpedia meta data
     needed to construct feature extractors.
     """
     args = {}
     args['filename'] = filename
-    args.update(get_visual(filename))
-    args.update(get_metadata(filename))
+    if visual:
+        args.update(get_visual(filename))
+    if textual:
+        args.update(get_metadata(filename))
     return args
 
 def get_visual(filename):
@@ -39,7 +41,7 @@ def get_metadata(filename):
             metadata = json.load(file_)
             return metadata
     except:
-        print('Medata not found', filename)
+        print('Metadata not found', filename)
         keys = ('title', 'long', 'description', 'url', 'lat', 'extension')
         return {key: '' for key in keys}
 

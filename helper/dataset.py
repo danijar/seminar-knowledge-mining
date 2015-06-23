@@ -1,39 +1,26 @@
 import os
 import json
 import sys
+import traceback
 import numpy as np
 from sklearn.cross_validation import train_test_split
 from sklearn.preprocessing import StandardScaler
 from helper.extraction import feature_vector, feature_names
-from helper.image import is_supported
+from helper.image import is_supported, UnsupportedImageError, ImageLoadingError
+from helper.extraction import FeatureExtractionError
 from helper.text import print_headline
 
 
 class Dataset:
 
-    def __init__(self, data=None, target=None, classes=None, filenames=None):
+    def __init__(self, data=None, target=None, classes=None, features=None, filenames=None):
         self.data = data
         self.target = target
         self.classes = classes
+        self.features = features
         self.filenames = filenames
 
-    def read_load_save(self, load, save, path, basename='dataset.json'):
-        assert load is bool
-        assert save is bool
-        dataset = Dataset()
-        filename = os.path.join(path, basename)
-        if load:
-            print('Load dataset from', filename, end=' ')
-            dataset.load(filename)
-            print('Done.')
-        else:
-            dataset.read(args.data)
-        if save:
-            print('Save dataset to', filename, end=' ')
-            dataset.save(filename)
-            print('Done.')
-
-    def read(self, root):
+    def read(self, root, visual=True, textual=True):
         data = []
         target = []
         self.classes = []
@@ -41,7 +28,7 @@ class Dataset:
         for directory in self._walk_directories(root):
             new_class = len(self.classes)
             directory_path = os.path.join(root, directory)
-            for filename, features in self._read_features(directory_path):
+            for filename, features in self._read_features(directory_path, visual, textual):
                 self.filenames.append(filename)
                 data.append(features)
                 target.append(new_class)
@@ -58,6 +45,7 @@ class Dataset:
             self.data = np.array(content['data'])
             self.target = np.array(content['target'])
             self.classes = content['classes']
+            self.features = content['features']
             self.filenames = content['filenames']
         self._assert_length()
         print('Done (' + str(len(self.target)) + ')')
@@ -68,6 +56,7 @@ class Dataset:
         content['data'] = self.data.tolist()
         content['target'] = self.target.tolist()
         content['classes'] = self.classes
+        content['features'] = self.features
         content['filenames'] = self.filenames
         with open(filename, 'w') as file_:
             json.dump(content, file_)
@@ -85,8 +74,8 @@ class Dataset:
             print('Training set size', train_target.shape[0])
             print('Test set size', test_target.shape[0])
             print('Feature vector length', train_data.shape[1])
-        training = Dataset(train_data, train_target, self.classes)
-        testing = Dataset(test_data, test_target, self.classes)
+        training = Dataset(train_data, train_target, self.classes, self.features)
+        testing = Dataset(test_data, test_target, self.classes, self.features)
         return training, testing
 
     def normalize(self, means=None, stds=None):
@@ -104,23 +93,28 @@ class Dataset:
         self.data = scaler.transform(self.data, copy=False)
         return scaler.mean_.tolist(), scaler.std_.tolist()
 
-    def _read_features(self, directory):
-        vector_length = len(feature_names())
+    def _read_features(self, directory, visual, textual):
+        self.features = feature_names(visual, textual)
         print_headline('Class: ' + os.path.basename(directory))
         count = 0
         for filename in self._walk_images(directory):
             try:
-                features = feature_vector(os.path.join(directory, filename))
-                assert len(features) == vector_length
                 # Display progress
-                print('Process {: <50}'.format(filename), flush=True, end='\r')
+                print('Process {: <62}'.format(filename), flush=True, end='\r')
+                features = feature_vector(os.path.join(directory, filename), visual, textual)
+                assert len(features) == len(self.features)
                 count += 1
                 yield filename, features
             except KeyboardInterrupt:
                 sys.exit(1)
-            except:
-                print('Error extracting features from', filename)
-        print('Loaded {} images'.format(count).ljust(58))
+            except UnsupportedImageError:
+                print('\nUnsupported image format')
+            except ImageLoadingError:
+                print('\nError opening image')
+            except FeatureExtractionError as extractor:
+                print('\nError extracting features in', extractor)
+                traceback.print_exc()
+        print('Loaded {} images'.format(count).ljust(80))
 
     def _walk_directories(self, root):
         return next(os.walk(root))[1]

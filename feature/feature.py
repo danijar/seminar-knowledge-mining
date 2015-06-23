@@ -1,9 +1,9 @@
 class Feature:
 
     def __init__(self, **kwargs):
-        expected = ('image', 'original', 'gray', 'filename', 'url',
+        allowed = ('image', 'original', 'gray', 'filename', 'url',
             'extension', 'title', 'description', 'lat', 'long')
-        assert set(kwargs.keys()) == set(expected)
+        assert all(arg in allowed for arg in kwargs.keys())
         self.__dict__.update(kwargs)
 
     @classmethod
@@ -16,6 +16,9 @@ class Feature:
     def show(self):
         raise NotImplementedError
 
+    def validate(self):
+        assert len(list(type(self).names())) == len(list(self.extract()))
+
     @staticmethod
     def multiple_names(name, amount):
         """
@@ -24,3 +27,12 @@ class Feature:
         """
         for i in range(amount):
             yield '{}_{}'.format(name, i)
+
+
+class FeatureExtractionError(Exception):
+
+    def __init__(self, extractor):
+        self.extractor = extractor
+
+    def __str__(self):
+        return repr(self.extractor)

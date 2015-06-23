@@ -1,4 +1,3 @@
-import sys
 import os
 import io
 import numpy as np
@@ -8,6 +7,14 @@ import skimage.exposure
 import cairosvg
 from PIL import Image
 from helper.plot import plot_image
+
+
+class UnsupportedImageError(Exception):
+    pass
+
+
+class ImageLoadingError(Exception):
+    pass
 
 
 def ensure_rgb(image):
@@ -76,16 +83,13 @@ def open_image(filename):
 
 def load(filename):
     if not is_supported(filename):
-        print('Skipped', filename)
-        return None
+        raise UnsupportedImageError
     try:
         image = open_image(filename)
         image = ensure_rgb(image)
-        max_size = 512, 512
-        image.thumbnail(max_size)
+        # max_size = 512, 512
+        # image.thumbnail(max_size)
         image = convert_to_array(image)
         return image
     except:
-        print('Error opening image')
-        print(sys.exc_info()[0])
-        return None
+        raise ImageLoadingError

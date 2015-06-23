@@ -73,14 +73,14 @@ if __name__ == '__main__':
         images.',
         formatter_class=ArgumentDefaultsHelpFormatter)
     parser.add_argument('features',
-        help='Path to the directory containing folders for each class that \
-        contain the images and metadata files')
+        help='Path to the JSON file containing extracted features of the \
+        dataset')
     parser.add_argument('-s', '--split', type=float, default=0.25,
         help='Fraction of data used for validation')
     parser.add_argument('-c', '--copy-predicted',
         default='<folder>/../<folder>-predicted/',
         help='Folder to copy predicted images into; sub directories for all \
-        classes are created')
+        classes are created; <folder> is the directory of the features file')
     args = parser.parse_args()
 
     if '<folder>' in args.copy_predicted:

@@ -13,30 +13,32 @@ def compute_chi(dataset):
     features = np.rollaxis(dataset.data, 1)
     for i, feature in enumerate(features):
         features[i] = feature - feature.min()
-    chi_values, p_values = chi2(dataset.data, dataset.target)
-    p_values = [1 - x for x in p_values]
-    return chi_values, p_values
+    chi2s, ps = chi2(dataset.data, dataset.target)
+    ps = [1 - x for x in ps]
+    chis = list(map(np.sqrt, chi2s))
+    return ps, chis
 
-def print_chi(names, dataset):
-    chi_values, p_values = compute_chi(dataset)
-    chi_values_sqrt = np.sqrt(chi_values)
-    max_chi_sqrt = max(chi_values_sqrt)
+def print_chi(dataset):
+    ps, chis = compute_chi(dataset)
+    max_chi = max(chis)
     print('')
-    print('Feature                         chi2    p-value chi       ')
-    print('----------------------------------------------------------')
-    for x in zip(names, chi_values, p_values, chi_values_sqrt):
-        bar = '#' * (10 * x[3] / max_chi_sqrt) if not np.isnan(x[3]) else ''
+    print('Feature                          chi     p       chi       ')
+    print('-----------------------------------------------------------')
+    for x in zip(dataset.features, chis, ps):
+        chi = x[1] if not np.isnan(x[1]) else 0
+        bar = '#' * int(10 * chi / max_chi)
         print('{: <25} {: >10.4f} {: >10.4f}'.format(*x), bar)
     print('')
 
-def write_chi(filename, names, dataset):
-    chi_values, p_values = compute_chi(dataset)
-    captions = ('Feature', 'chi2', 'p-value')
-    data = (names, chi_values, p_values)
+def write_chi(filename, dataset):
+    ps, chis = compute_chi(dataset)
+    captions = ('Feature', 'chi', 'p')
+    data = (dataset.features, chis, ps)
     write_csv(filename, captions, data)
 
 def write_csv(filename, captions, data):
     assert len(captions) == len(data)
+    assert all(len(x) == len(data[0]) for x in data)
     with open(filename, 'w') as csv:
         csv.write(','.join(captions) + '\n')
         for row in range(len(data[0])):
@@ -48,11 +50,11 @@ if __name__ == '__main__':
         within the images of the same class to evaluate features.',
         formatter_class=ArgumentDefaultsHelpFormatter)
     parser.add_argument('features',
-        help='Path to the directory containing folders for each class that \
-        contain the images and metadata files')
+        help='Path to the JSON file containing extracted features of the \
+        dataset')
     parser.add_argument('-o', '--output', default='<folder>/evaluation.csv',
         help='Filename of the CSV file where p-values will be written to; \
-        folder is replaced by the features folder')
+        <folder> is the directory of the features file')
     args = parser.parse_args()
 
     folder = os.path.splitext(os.path.split(args.features)[0])[0]
@@ -61,8 +63,7 @@ if __name__ == '__main__':
     dataset = Dataset()
     dataset.load(args.features)
 
-    names = feature_names()
-    print_chi(names, dataset)
+    print_chi(dataset)
     print('Write CSV table to', args.output)
-    write_chi(args.output, names, dataset)
+    write_chi(args.output, dataset)
     print('Done')

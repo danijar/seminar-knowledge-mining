@@ -1,5 +1,7 @@
-from .feature import Feature
+import re
+import os
 from sklearn.feature_extraction.text import CountVectorizer
+from .feature import Feature
 
 
 SYNONYMS = {
@@ -44,14 +46,17 @@ class WordsFeature(Feature):
 
     @classmethod
     def initialize_vectorizer(cls):
-        cls.vectorizer = CountVectorizer(
-            decode_error='replace',
-            strip_accents='unicode',
-            analyzer='word',
-            stop_words='english',
-            token_pattern=r'[A-Z]*[a-z]{2,}',
-            vocabulary=cls.terms
-        )
+        cls.vectorizer = CountVectorizer(decode_error='replace',
+            strip_accents='unicode', stop_words='english', vocabulary=cls.terms)
+
+    @classmethod
+    def preprocess_text(cls, url, title, description):
+        url = os.path.splitext(os.path.split(url)[1])[0]
+        text = ' '.join((url, title, description))
+        chunks = re.findall(r'[A-Z]?[a-z]{2,}', text)
+        text = ' '.join(chunks)
+        text = text.lower()
+        return text
 
     @classmethod
     def names(cls):
@@ -59,8 +64,8 @@ class WordsFeature(Feature):
             yield 'words_' + bucket
 
     def extract(self):
-        text = ' '.join((self.url, self.title, self.description))
         cls = type(self)
+        text = cls.preprocess_text(self.url, self.title, self.description)
         term_counts = cls.vectorizer.transform([text]).toarray()[0].tolist()
         # Aggregate term counts into buckets
         bucket_counts = [0 for _ in cls.bucket_names]

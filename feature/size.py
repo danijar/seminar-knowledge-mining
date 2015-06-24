@@ -7,11 +7,9 @@ class SizeFeature(Feature):
         super().__init__(*args, **kwargs)
 
     def extract(self):
-        width = self.original.shape[0]
-        height = self.original.shape[1]
-        yield width
-        yield height
-        yield width / height
+        yield self.width
+        yield self.height
+        yield self.width / self.height
 
     @classmethod
     def names(cls):

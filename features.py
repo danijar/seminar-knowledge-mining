@@ -1,7 +1,6 @@
 from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
 from helper.plot import plot_image
-from helper.extraction import feature_names, feature_vector
-from helper.preprocess import get_inputs
+from helper.extraction import feature_names, feature_vector, get_inputs
 
 
 def print_features(names, features):

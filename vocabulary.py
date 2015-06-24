@@ -3,7 +3,7 @@ import json
 from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
 import numpy as np
 from helper.dataset import Dataset
-from helper.preprocess import get_metadata
+from helper.extraction import get_metadata
 from helper.vocabulary import preprocess_text, get_frequencies, get_top_frequencies
 from helper.text import print_headline
 from feature.words import WordsFeature

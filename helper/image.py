@@ -44,6 +44,14 @@ def convert_to_array(image):
     image = np.asarray(image, dtype=np.uint8)
     return image
 
+def clamp_size(image, width=512, height=512):
+    """
+    Ensure that the image is not larger than the specifier dimensions. If
+    needed, the image will be scaled down in place.
+    """
+    size = (width, height)
+    image.thumbnail(size)
+
 def preprocess(image):
     # Force scale to size
     nearest = 0
@@ -81,15 +89,17 @@ def open_image(filename):
     else:
         return Image.open(filename)
 
-def load(filename):
+def load(filename, clamp_size=True):
     if not is_supported(filename):
         raise UnsupportedImageError
     try:
         image = open_image(filename)
         image = ensure_rgb(image)
-        # max_size = 512, 512
-        # image.thumbnail(max_size)
+        size = image.size
+        if clamp_size:
+            max_size = (512, 512)
+            image.thumbnail(max_size)
         image = convert_to_array(image)
-        return image
+        return image, size if clamp_size else image
     except:
         raise ImageLoadingError

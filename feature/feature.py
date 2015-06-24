@@ -1,8 +1,8 @@
 class Feature:
 
     def __init__(self, **kwargs):
-        allowed = ('image', 'original', 'gray', 'filename', 'url',
-            'extension', 'title', 'description', 'lat', 'long')
+        allowed = ('width', 'height', 'original', 'image', 'gray', 'filename',
+            'url', 'extension', 'title', 'description', 'lat', 'long')
         assert all(arg in allowed for arg in kwargs.keys())
         self.__dict__.update(kwargs)
 

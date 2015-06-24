@@ -1,79 +1,44 @@
 import re
 import os
-from sklearn.feature_extraction.text import CountVectorizer
 from .feature import Feature
-
-
-SYNONYMS = {
-    'chart':         ['chart', 'diagram'],
-    'document':      ['document', 'scan'],
-    'drawn':         ['drawn', 'sketch'],
-    'embellishment': ['embellishment'],
-    'flag':          ['flag', 'state'],
-    'icon':          ['icon', 'pictogram'],
-    'landscape':     ['landscape', 'view', 'mountains'],
-    'logo':          ['logo', 'coat', 'arms'],
-    'map':           ['map', 'country'],
-    'object':        ['object'],
-    'painting':      ['painting', 'art'],
-    'portrait':      ['portrait', 'face'],
-    'sample':        ['sample'],
-    'scenery':       ['scenery', 'situation', 'people'],
-    'scheme':        ['scheme', 'figure', 'flow', 'schematic'],
-    'sign':          ['sign'],
-}
+from helper.vocabulary import create_vectorizer, preprocess_text, load_vocabulary
 
 
 class WordsFeature(Feature):
 
-    terms = []
-    term_buckets = []
-    bucket_names = []
+    _vocabulary = []
+    _buckets = []
+    _terms = []
+    _vectorizer = None
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
     @classmethod
-    def initialize_vocabulary(cls, synonyms):
-        # Convert to list of tuples for persistent ordering
-        mapping = sorted(synonyms.items(), key=lambda x: x[0])
-        for index, (bucket, terms) in enumerate(mapping):
-            # Create plain list of all terms
-            cls.terms += terms
-            # Remember mapping to buckets and thier names
-            cls.term_buckets += [len(cls.bucket_names)] * len(terms)
-            cls.bucket_names.append(bucket)
+    def load_vocabulary(cls, filename):
+        cls._vocabulary, cls._buckets, cls._terms = load_vocabulary(filename)
+        cls._vectorizer = create_vectorizer(cls._terms)
 
     @classmethod
-    def initialize_vectorizer(cls):
-        cls.vectorizer = CountVectorizer(decode_error='replace',
-            strip_accents='unicode', stop_words='english', vocabulary=cls.terms)
-
-    @classmethod
-    def preprocess_text(cls, url, title, description):
-        url = os.path.splitext(os.path.split(url)[1])[0]
-        text = ' '.join((url, title, description))
-        chunks = re.findall(r'[A-Z]?[a-z]{2,}', text)
-        text = ' '.join(chunks)
-        text = text.lower()
-        return text
+    def ensure_vocabulary(cls):
+        assert cls._vectorizer, 'Class must be initialized with load_vocabulary()'
 
     @classmethod
     def names(cls):
-        for bucket in cls.bucket_names:
+        cls.ensure_vocabulary()
+        for bucket in cls._buckets:
             yield 'words_' + bucket
 
     def extract(self):
         cls = type(self)
-        text = cls.preprocess_text(self.url, self.title, self.description)
-        term_counts = cls.vectorizer.transform([text]).toarray()[0].tolist()
+        cls.ensure_vocabulary()
+        text = preprocess_text(self.url, self.title, self.description)
+        term_counts = cls._vectorizer.transform([text]).toarray()[0].tolist()
         # Aggregate term counts into buckets
-        bucket_counts = [0 for _ in cls.bucket_names]
-        for term, count in enumerate(term_counts):
-            bucket = cls.term_buckets[term]
-            bucket_counts[bucket] += count
-        yield from bucket_counts
-
-
-WordsFeature.initialize_vocabulary(SYNONYMS)
-WordsFeature.initialize_vectorizer()
+        counts = [0 for _ in cls._buckets]
+        for term_index, count in enumerate(term_counts):
+            term = cls._terms[term_index]
+            for bucket_index, bucket in enumerate(cls._buckets):
+                if term in cls._vocabulary[bucket]:
+                    counts[bucket_index] += count
+        yield from counts

@@ -1,53 +1,43 @@
 import os
+import json
 from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
 import numpy as np
-from scipy.sparse import coo_matrix
 from helper.dataset import Dataset
 from helper.preprocess import get_metadata
+from helper.vocabulary import preprocess_text, get_frequencies, get_top_frequencies
 from helper.text import print_headline
 from feature.words import WordsFeature
-from sklearn.feature_extraction.text import CountVectorizer
 
 
 def iterate_texts(directory):
     for filename in Dataset()._walk_images(directory):
         metadata = get_metadata(os.path.join(directory, filename))
-        text = WordsFeature.preprocess_text(metadata['url'], metadata['title'], metadata['description'])
+        text = preprocess_text(metadata['url'], metadata['title'], metadata['description'])
         yield text
 
 def iterate_overall_texts(root):
     for directory in Dataset()._walk_directories(root):
         yield from iterate_texts(os.path.join(root, directory))
 
-def get_vocabulary(texts):
-    vectorizer = CountVectorizer(decode_error='replace', strip_accents='unicode', stop_words='english')
-    term_counts = vectorizer.fit_transform(texts)
-    term_counts = coo_matrix.sum(term_counts, axis=0).tolist()[0]
-    amount = sum(term_counts)
-    mapping = vectorizer.vocabulary_
-    vocabulary = {term: term_counts[index] / amount for term, index in mapping.items()}
-    return vocabulary
-
-def compute_tfidf(vocabulary, overall):
+def compute_tfidf(frequencies, overall):
     """
-    Returns a copy of the vocabulary mapping to TFIDF scores instead of the
+    Returns a copy of the frequencies mapping to TFIDF scores instead of the
     frequencies. TFIDF is a measure for how unique the frequency is
     compared to the overall dataset.
     """
-    assert all(0 <= frequency <= 1 for frequency in vocabulary.values())
+    assert all(0 <= frequency <= 1 for frequency in frequencies.values())
     assert all(0 <= frequency <= 1 for frequency in overall.values())
-    assert all(term in overall for term in vocabulary)
+    assert all(term in overall for term in frequencies)
     result = {}
-    for term in vocabulary:
-        score = vocabulary[term] / (1 - overall[term])
+    for term in frequencies:
+        score = frequencies[term] / (1 - overall[term])
         result[term] = score
     return result
 
-def print_vocabulary(vocabulary, limit=None):
-    vocabulary = sorted(vocabulary.items(), key=lambda x: x[1], reverse=True)
-    if limit and len(vocabulary) > limit:
-        vocabulary = vocabulary[:limit]
-    for term, frequency in vocabulary:
+def print_frequencies(frequencies, limit=None):
+    frequencies = get_top_frequencies(frequencies, limit).items()
+    frequencies = sorted(frequencies, key=lambda x: x[1])
+    for term, frequency in frequencies:
         print('{: <20} {: >6.2f}%'.format(term, frequency * 100))
 
 
@@ -64,15 +54,22 @@ if __name__ == '__main__':
         help='Filename of the JSON vocabulary that will be written')
     args = parser.parse_args()
 
-    if '<dataset>' in args.output:
-        args.output = args.output.replace('<dataset>', args.dataset)
+    args.output = args.output.replace('<dataset>', args.dataset)
 
     text = iterate_overall_texts(args.dataset)
-    overall = get_vocabulary(text)
+    overall = get_frequencies(text)
 
+    vocabulary = {}
     for directory in Dataset()._walk_directories(args.dataset):
         print_headline(directory)
         texts = iterate_texts(os.path.join(args.dataset, directory))
-        vocabulary = get_vocabulary(texts)
-        vocabulary = compute_tfidf(vocabulary, overall)
-        print_vocabulary(vocabulary, args.limit)
+        frequencies = get_frequencies(texts)
+        frequencies = compute_tfidf(frequencies, overall)
+        synonyms = list(get_top_frequencies(frequencies, args.limit).keys())
+        vocabulary[directory] = synonyms
+        print_frequencies(frequencies, args.limit)
+
+    print('')
+    print('Write vocabulary to', args.output)
+    json.dump(vocabulary, open(args.output, 'w'))
+    print('Done')

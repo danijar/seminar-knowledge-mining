@@ -9,20 +9,20 @@ Set up instructions
 1. Install these dependencies by using your system's package manager if you
 don't have them already.
 
-    | Depdendency |  Debian package  |    Arch package   |
-    | ----------- | ---------------- | ----------------- |
-    | Python 3    | python3          | python            |
-    | Cython      | cython3          | cython            |
-    | Pip         | python3-pip      | python-pip        |
-    | Virtualenv  | virtualenv       | python-virtualenv |
-    | Fortran     | gfortran         | gcc-fortran       |
-    | Blas        | libblas-dev      | blas              |
-    | Lapack      | liblapack-dev    | lapack            |
-    | PNG         | libpng-dev       | libpng            |
-    | JPEG        | libjpeg8-dev     | libjpeg-turbo     |
-    | Freetype    | libfreetype6-dev | freetype2         |
-    | Cairo       | libcairo2-dev    |                   |
-    | FFI         | libffi-dev       |                   |
+    | Depdendency |     Aptitude     |       Pacman      | Homebrew |
+    | ----------- | ---------------- | ----------------- | -------- |
+    | Python 3    | python3          | python            |          |
+    | Cython      | cython3          | cython            |          |
+    | Pip         | python3-pip      | python-pip        |          |
+    | Virtualenv  | virtualenv       | python-virtualenv |          |
+    | Fortran     | gfortran         | gcc-fortran       |          |
+    | Blas        | libblas-dev      | blas              |          |
+    | Lapack      | liblapack-dev    | lapack            |          |
+    | PNG         | libpng-dev       | libpng            |          |
+    | JPEG        | libjpeg8-dev     | libjpeg-turbo     |          |
+    | Freetype    | libfreetype6-dev | freetype2         |          |
+    | Cairo       | libcairo2-dev    |                   | cairo    |
+    | FFI         | libffi-dev       |                   |          |
 
 2. Create a virtual environment inside the repository root by runnning
 `virtualenv .` or if you have multiple Python versions `virtualenv -p python3
@@ -49,6 +49,14 @@ each list. Run `pip install <path-to-file>` on each of those.
 
 4. Install remaining dependencies inside your virtual environment using `pip
 install -r requirements.txt`.
+
+On Mac, also add these lines to your `.bash_profile` and apply the changes
+with `source ~/.bash_profile`.
+
+```
+export LC_ALL=en_US.UTF-8
+export LANG=en_US.UTF-8
+```
 
 Workflows
 ---------

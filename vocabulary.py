@@ -9,6 +9,10 @@ from helper.text import print_headline
 from feature.words import WordsFeature
 
 
+def read_lines(filename):
+    with open(filename) as file_:
+        return file_.read().splitlines()
+
 def iterate_texts(directory):
     for filename in Dataset()._walk_images(directory):
         metadata = get_metadata(os.path.join(directory, filename))
@@ -36,7 +40,7 @@ def compute_tfidf(frequencies, overall):
 
 def print_frequencies(frequencies, limit=None):
     frequencies = get_top_frequencies(frequencies, limit).items()
-    frequencies = sorted(frequencies, key=lambda x: x[1])
+    frequencies = sorted(frequencies, key=lambda x: x[1], reverse=True)
     for term, frequency in frequencies:
         print('{: <20} {: >6.2f}%'.format(term, frequency * 100))
 
@@ -52,18 +56,24 @@ if __name__ == '__main__':
         help='Maximal amount of words to display for each class')
     parser.add_argument('-o', '--output', default='<dataset>/vocabulary.json',
         help='Filename of the JSON vocabulary that will be written')
+    parser.add_argument('-s', '--stopwords', default='english',
+        help='Path to a file containing a list of stopwords; defaults to \
+        an english stopwords list')
     args = parser.parse_args()
 
     args.output = args.output.replace('<dataset>', args.dataset)
 
+    if os.path.isfile(args.stopwords):
+        args.stopwords = read_lines(args.stopwords)
+
     text = iterate_overall_texts(args.dataset)
-    overall = get_frequencies(text)
+    overall = get_frequencies(text, args.stopwords)
 
     vocabulary = {}
     for directory in Dataset()._walk_directories(args.dataset):
         print_headline(directory)
         texts = iterate_texts(os.path.join(args.dataset, directory))
-        frequencies = get_frequencies(texts)
+        frequencies = get_frequencies(texts, args.stopwords)
         frequencies = compute_tfidf(frequencies, overall)
         synonyms = list(get_top_frequencies(frequencies, args.limit).keys())
         vocabulary[directory] = synonyms

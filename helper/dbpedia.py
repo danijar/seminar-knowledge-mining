@@ -13,36 +13,23 @@ METADATA = {
 }
 
 
-def fetch_uris(keywords, amount):
+def fetch_uris_from_metadata(keywords, amount):
     """
-    Query the DBpedia SPARQL endpoint to fetch amount names of images that
-    contain at least one of keywords in their description.
+    Query DBpedia for image uris where one of the keywords is found in the
+    'label' tag.
     """
-    try:
-        data = query_uris(keywords, amount)
-        filenames = parse_uris(data)
-        return list(filenames)
-    except:
-        print('Could not get filenames for keyword', keywords)
+    ontology = '<http://www.w3.org/2000/01/rdf-schema#label>'
+    uris = query_uris_from_keywords(ontology, keywords, amount)
+    return uris
 
-def query_uris(keywords, amount):
-    print('Query images for', ','.join(keywords))
-    keywords = '|'.join(keywords)
-    keywords = r'(^|\\W)(' + keywords + r')(\\W|$)'
-    query = """PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-            PREFIX dbpc: <http://dbpedia.org/ontology/>
-            PREFIX foaf: <http://xmlns.com/foaf/0.1/>
-            SELECT DISTINCT ?s WHERE {{
-                ?s ?p ?keyword; rdf:type foaf:Image
-                FILTER regex(str(?keyword), "{keywords}", "i")
-                FILTER (?p = <http://www.w3.org/2000/01/rdf-schema#label>)
-            }} LIMIT {amount}""".format(**locals())
-    result = execute_query(query)
-    return result
-
-def parse_uris(json):
-    for result in json['results']['bindings']:
-        yield result['s']['value']
+def fetch_uris_from_articles(keywords, amount):
+    """
+    Query DBpedia for image uris where one of the keywords is found in the
+    the name of an article using the image.
+    """
+    ontology = '<http://dbpedia.org/ontology/galleryItem>'
+    uris = query_uris_from_keywords(ontology, keywords, amount)
+    return uris
 
 def fetch_metadata(uri):
     resource = '<{}>'.format(uri)
@@ -64,19 +51,45 @@ def fetch_properties(resource, properties):
     except:
         print('Error retrieving', resource.strip('<>'))
 
-def query_properties(resource):
-    query = """SELECT DISTINCT ?s ?p ?o WHERE {{
-            ?s ?p ?o
-            FILTER (?s = {resource}) }}""".format(**locals())
+def query_uris_from_keywords(ontology, keywords, amount):
+    print('Query image URIs for:' , ','.join(keywords))
+    assert isinstance(ontology, str)
+    keywords = '|'.join(keywords)
+    keywords = r'(^|\\W)(' + keywords + r')(\\W|$)'
+    filters = [
+        '?uri {} ?object; rdf:type foaf:Image'.format(ontology),
+        'FILTER regex(str(?object), "{}", "i")'.format(keywords)
+    ]
+    results = query_uris(filters, amount)
+    uris = parse_uris(results)
+    return list(uris)
+
+def query_uris(filters, amount=5000):
+    """
+    Query DBpedia for image uris where all of the SPARQL filter rules apply.
+    """
+    filters = '\n'.join(filters)
+    query = 'SELECT DISTINCT ?uri WHERE {{ {filters} }} LIMIT {amount}'.format(**locals())
     result = execute_query(query)
     return result
+
+def query_properties(resource):
+    query = """SELECT DISTINCT ?subject ?predicate ?object WHERE {{
+            ?subject ?predicate ?object
+            FILTER (?subject = {resource}) }}""".format(**locals())
+    result = execute_query(query)
+    return result
+
+def parse_uris(json):
+    for result in json['results']['bindings']:
+        yield result['uri']['value']
 
 def parse_properties(data, predicates):
     properties = {x: '' for x in predicates}
     for result in data['results']['bindings']:
-        predicate = result['p']['value']
+        predicate = result['predicate']['value']
         if predicate in predicates:
-            properties[predicate] = result['o']['value']
+            properties[predicate] = result['object']['value']
     return properties
 
 def execute_query(query):

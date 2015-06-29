@@ -1,30 +1,50 @@
 import os
 import json
 import uuid
+from datetime import datetime
 from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
 from helper.download import ensure_directory, get_filename, download_file
-from helper.dbpedia import fetch_uris, fetch_metadata
+from helper.dbpedia import (fetch_uris_from_metadata, fetch_uris_from_articles,
+    fetch_metadata)
 
 
-def read_uris(filename):
-    with open(filename) as uris:
-        return [uri.rstrip('\n') for uri in uris]
+def read_lines(filename):
+    with open(filename) as file_:
+        return file_.read().splitlines()
 
 def images_and_metadata(uris, directory):
-    amount = len(uris)
+    """
+    For each uri fetch metadata from DBpedia and their image files from
+    Wikimedia Commons. Uris can be either Wikimedia Commons or DBpedia Commons
+    resources.
+    """
+    uris = list(set(uris))
+    overall = len(uris)
     for index, uri in enumerate(uris):
         name = remove_prefix(os.path.basename(uri), 'File:')
-        print('Image {index}/{amount}: {name}'.format(**locals()))
+        print('Image {index}/{overall}: {name}'.format(**locals()))
+        uri = ensure_dbpedia_resource(uri)
         metadata = fetch_metadata(uri)
         if not metadata or not metadata['description']:
             print('Skip image without description')
             continue
         try:
             identifier = str(uuid.uuid4())
-            store_metadata(metadata, directory, identifier)
             store_image(metadata['url'], directory, identifier)
+            store_metadata(metadata, directory, identifier)
         except:
             print('Error downloading image')
+
+def ensure_dbpedia_resource(uri):
+    wikimedia = '//commons.wikimedia.org/wiki'
+    dbpedia = '//commons.dbpedia.org/resource'
+    if dbpedia in uri:
+        return uri
+    elif wikimedia in uri:
+        return dbpedia.replace(wikimedia, dbpedia)
+    else:
+        raise RuntimeError('Resource identifier ' + uri +
+            ' cannot be converted to DBpedia identifier')
 
 def store_metadata(metadata, directory, identifier):
     filename = os.path.join(directory, identifier + '.json')
@@ -46,28 +66,37 @@ if __name__ == '__main__':
     parser = ArgumentParser(description='Download Wikimedia Commons images \
         their DBpedia metadata.',
         formatter_class=ArgumentDefaultsHelpFormatter)
-    parser.add_argument('-q', '--query',
-        help='Search term')
-    parser.add_argument('-c', '--count', type=int, default=20,
-        help='Amount of result images to fetch')
+    parser.add_argument('-m', '--metadata-query', nargs='*',
+        help='Keywords to look for in the image description')
+    parser.add_argument('-a', '--article-query', nargs='*',
+        help='Keywords to look for in names of articles containing the images')
+    parser.add_argument('-c', '--count', type=int, default=100,
+        help='Amount of query result images to fetch; images without \
+        metadata will be skipped so fewer images may be downloaded')
     parser.add_argument('-u', '--uris',
         help='Download images and metadata from existing list of Wikimedia \
-        Commons uris; ignores --query and --count')
-    parser.add_argument('-d', '--directory', default='data/commons/<name>',
-        help='Directory to download images into; gets created if not exists; \
-        <name> gets replaced with query or filename or uris list')
+        Commons uris rather than querying them first')
+    parser.add_argument('-d', '--directory',
+        default='data/fetch/<timestamp>-commons',
+        help='Directory to download images into; gets created if not exists')
     args = parser.parse_args()
 
-
+    timestamp = str(datetime.now().strftime('%y-%m-%d-%H-%M'))
+    directory = args.directory.replace('<timestamp>', timestamp)
     uris = []
     if args.uris:
-        basename = os.path.basename(args.uris)
-        args.directory = args.directory.replace('<name>', basename)
-        uris = read_uris(args.uris)
-    elif args.query:
-        args.directory = args.directory.replace('<name>', args.query)
-        uris = fetch_uris([args.query], args.count)
+        name = os.path.basename(args.uris)
+        uris = read_lines(args.uris)
+    elif args.metadata_query:
+        name = args.metadata_query[0]
+        uris = fetch_uris_from_metadata(args.metadata_query, args.count)
+    elif args.article_query:
+        name = args.article_query[0]
+        uris = fetch_uris_from_articles(args.article_query, args.count)
     else:
-        print('One of parameters --uris and --query is required')
-    ensure_directory(args.directory)
-    images_and_metadata(uris, args.directory)
+        assert False, ('One of parameters --uris, --metadata-query and ' +
+            '--article-query is required')
+
+    ensure_directory(directory)
+    print('Download', len(uris), 'images and metadata into', directory)
+    images_and_metadata(uris, directory)

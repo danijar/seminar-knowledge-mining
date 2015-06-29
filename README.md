@@ -21,6 +21,8 @@ don't have them already.
     | PNG         | libpng-dev       | libpng            |
     | JPEG        | libjpeg8-dev     | libjpeg-turbo     |
     | Freetype    | libfreetype6-dev | freetype2         |
+    | Cairo       | libcairo2-dev    |                   |
+    | FFI         | libffi-dev       |                   |
 
 2. Create a virtual environment inside the repository root by runnning
 `virtualenv .` or if you have multiple Python versions `virtualenv -p python3

@@ -1,6 +1,10 @@
 Seminar Knowledge Mining
 ========================
 
+[![Code Climate](https://codeclimate.com/github/danijar/seminar-knowledge-mining/badges/gpa.svg)](https://codeclimate.com/github/danijar/seminar-knowledge-mining)
+
+Wikimedia image classification and suggestions for article authors.
+ 
 Set up instructions
 -------------------
 
@@ -31,6 +35,11 @@ don't have them already.
 that the repository name is in front of your shell promt now.
 4. Install dependencies inside your virtual environment using `pip install -r
 requirements.txt`.
+5. UTF-8 is required, so you may need to add these lines to your
+`~/.bash_profile` and apply the changes with `source ~/.bash_profile`.
+
+        export LC_ALL=en_US.UTF-8
+        export LANG=en_US.UTF-8
 
 ### Windows
 
@@ -49,14 +58,6 @@ each list. Run `pip install <path-to-file>` on each of those.
 
 4. Install remaining dependencies inside your virtual environment using `pip
 install -r requirements.txt`.
-
-On Mac, also add these lines to your `.bash_profile` and apply the changes
-with `source ~/.bash_profile`.
-
-```
-export LC_ALL=en_US.UTF-8
-export LANG=en_US.UTF-8
-```
 
 Workflows
 ---------

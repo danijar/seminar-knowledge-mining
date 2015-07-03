@@ -4,28 +4,27 @@ from .feature import Feature
 
 class ColorFeature(Feature):
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.pixels = self.image.reshape(-1, self.image.shape[-1])
-        self.channels = np.rollaxis(self.original, 2)
+    def name(self):
+        return 'color'
 
-    @classmethod
-    def names(cls):
-        yield 'color_distinct_amount'
+    def keys(self):
+        yield 'distinct_amount'
         rgb = 'red', 'green', 'blue'
-        yield from ['color_mean_' + x for x in rgb]
-        yield from ['color_variance_' + x for x in rgb]
+        yield from ['mean_' + x for x in rgb]
+        yield from ['variance_' + x for x in rgb]
 
-    def extract(self):
-        yield self.amount()
-        yield from self.means()
-        yield from self.variances()
+    def extract(self, sample):
+        pixels = sample.image.reshape(-1, sample.image.shape[-1])
+        channels = np.rollaxis(sample.original, 2)
+        yield self.amount(pixels)
+        yield from self.means(channels)
+        yield from self.variances(channels)
 
-    def amount(self):
-        return len(np.unique(self.pixels))
+    def amount(self, pixels):
+        return len(np.unique(pixels))
 
-    def means(self):
-        return [x.mean() for x in self.channels]
+    def means(self, channels):
+        return [x.mean() for x in channels]
 
-    def variances(self):
-        return [x.var() for x in self.channels]
+    def variances(self, channels):
+        return [x.var() for x in channels]

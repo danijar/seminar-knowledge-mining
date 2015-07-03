@@ -3,15 +3,11 @@ from .feature import Feature
 
 class GeoFeature(Feature):
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def name(self):
+        return 'geo'
 
-    def extract(self):
-        if self.lat and self.long:
-            yield 1
-        else:
-            yield 0
+    def keys(self):
+        yield 'exists'
 
-    @classmethod
-    def names(cls):
-        yield 'geo_exists'
+    def extract(self, sample):
+        yield int(bool(sample.lat and sample.long))

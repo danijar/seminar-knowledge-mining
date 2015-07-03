@@ -28,8 +28,9 @@ class Dataset:
         self.features = list(self._feature_names())
         for index, sample in enumerate(self.samples):
             # Display progress
-            filename = os.path.basename(sample.filename)
-            self._log('Process [{: >3}]% {: <61}'.format(
+            filename = sample.filename[len(root):]
+            filename = filename[:58] + (filename[58:] and '...')
+            self._log('Process [{: >3}%] {: <61}'.format(
                 index * 100 // len(self.samples), filename),
                 flush=True, end='\r')
             # Find label index
@@ -156,10 +157,6 @@ class Dataset:
                 yield name + '_' + key
 
     def _feature_vector(self, sample):
-        # Check for metadata
-        if not sample.metadata:
-            self._log('\nMetadata not found')
-            return None
         # Extract features
         combined = []
         for extractor in self.extractors:

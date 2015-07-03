@@ -4,7 +4,7 @@ import itertools
 from sklearn.feature_extraction.text import CountVectorizer
 from scipy.sparse import coo_matrix
 import snowballstemmer
-from .feature import Feature
+from .feature import Feature, FeatureExtractionError
 
 
 class WordsFeature(Feature):
@@ -37,6 +37,10 @@ class WordsFeature(Feature):
         return self.buckets
 
     def extract(self, sample):
+        # Check for metadata
+        if not sample.metadata:
+            raise FeatureExtractionError(self, 'Metadata not found')
+        # Count words
         text = self._preprocess_text(sample.url, sample.title,
             sample.description)
         term_counts = self.vectorizer.transform([text]).toarray()[0].tolist()

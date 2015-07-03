@@ -1,10 +1,8 @@
 import os
 import numpy as np
 from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
-from extraction import feature_names
 from sklearn.feature_selection import chi2
 from helper.dataset import Dataset
-from helper.text import print_headline
 
 
 def compute_chi(dataset):
@@ -18,6 +16,7 @@ def compute_chi(dataset):
     chis = list(map(np.sqrt, chi2s))
     return ps, chis
 
+
 def print_chi(dataset):
     ps, chis = compute_chi(dataset)
     max_chi = max(chis)
@@ -30,11 +29,13 @@ def print_chi(dataset):
         print('{: <25} {: >10.4f} {: >10.4f}'.format(*x), bar)
     print('')
 
+
 def write_chi(filename, dataset):
     ps, chis = compute_chi(dataset)
     captions = ('Feature', 'chi', 'p')
     data = (dataset.features, chis, ps)
     write_csv(filename, captions, data)
+
 
 def write_csv(filename, captions, data):
     assert len(captions) == len(data)
@@ -46,15 +47,15 @@ def write_csv(filename, captions, data):
 
 
 if __name__ == '__main__':
-    parser = ArgumentParser(description='Measure statistics of features \
-        within the images of the same class to evaluate features.',
+    parser = ArgumentParser(description='Measure statistics of features '
+        'within the images of the same class to evaluate features.',
         formatter_class=ArgumentDefaultsHelpFormatter)
     parser.add_argument('features',
-        help='Path to the JSON file containing extracted features of the \
-        dataset')
+        help='Path to the JSON file containing extracted features of the '
+        'dataset')
     parser.add_argument('-o', '--output', default='<folder>/evaluation.csv',
-        help='Filename of the CSV file where p-values will be written to; \
-        <folder> is the directory of the features file')
+        help='Filename of the CSV file where p-values will be written to; '
+        '<folder> is the directory of the features file')
     args = parser.parse_args()
 
     folder = os.path.splitext(os.path.split(args.features)[0])[0]

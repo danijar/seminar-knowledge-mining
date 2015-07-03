@@ -1,23 +1,22 @@
 import numpy as np
-import skimage
 from .feature import Feature
 
 
 class HistogramFeature(Feature):
-    bins = 5
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.hsv = skimage.color.rgb2hsv(self.image)
+    def __init__(self, bins=8):
+        self.bins = bins
 
-    @classmethod
-    def names(cls):
+    def name(self):
+        return 'histogram'
+
+    def keys(self):
         for name in ['hue', 'saturation', 'value']:
-            yield from cls.multiple_names('histogram_' + name, cls.bins)
+            yield from ['{}_{!s}'.format(name, x) for x in range(self.bins)]
 
-    def extract(self):
+    def extract(self, sample):
         for i in range(3):
-            channel = self.hsv[:,:,i]
+            channel = sample.hsv[:, :, i]
             histogram, edges = np.histogram(channel, bins=self.bins,
                 range=(0, 1), density=True)
             normalized = histogram * np.diff(edges)

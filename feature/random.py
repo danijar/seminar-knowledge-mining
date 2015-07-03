@@ -8,10 +8,11 @@ class RandomFeature(Feature):
     Should not be used in production.
     """
 
-    @classmethod
-    def names(cls):
-        return ['random']
+    def name(self):
+        return 'random'
 
-    def extract(self):
-        value = random.random()
-        return [value]
+    def keys(self):
+        yield 'random'
+
+    def extract(self, sample):
+        yield random.random()

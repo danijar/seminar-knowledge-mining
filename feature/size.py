@@ -3,16 +3,15 @@ from .feature import Feature
 
 class SizeFeature(Feature):
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def name(self):
+        return 'size'
 
-    def extract(self):
-        yield self.width
-        yield self.height
-        yield self.width / self.height
+    def keys(self):
+        yield 'width'
+        yield 'height'
+        yield 'ratio'
 
-    @classmethod
-    def names(cls):
-        yield 'external_width'
-        yield 'external_height'
-        yield 'external_ratio'
+    def extract(self, sample):
+        yield sample.width
+        yield sample.height
+        yield sample.width / sample.height

@@ -28,11 +28,8 @@ class Dataset:
         self.features = list(self._feature_names())
         for index, sample in enumerate(self.samples):
             # Display progress
-            filename = sample.filename[len(root):]
-            filename = filename[:58] + (filename[58:] and '...')
-            self._log('Process [{: >3}%] {: <61}'.format(
-                index * 100 // len(self.samples), filename),
-                flush=True, end='\r')
+            name = sample.filename[len(root):]
+            self._log_progress(name, index, len(self.samples))
             # Find label index
             if sample.label not in self.labels:
                 self.labels.append(sample.label)
@@ -138,18 +135,6 @@ class Dataset:
             if is_supported(filename):
                 yield filename
 
-    def _create_subset(self, data, target):
-        dataset = Dataset()
-        dataset.data = data
-        dataset.target = target
-        dataset.labels = self.labels
-        dataset.features = self.features
-        return dataset
-
-    def _validate(self):
-        assert len(self.data) == len(self.target)
-        assert isinstance(self.features[0], str)
-
     def _feature_names(self):
         for extractor in self.extractors:
             name = extractor.name()
@@ -182,6 +167,18 @@ class Dataset:
             self._log('\nError extracting features in', extractor)
             traceback.print_exc()
 
+    def _create_subset(self, data, target):
+        dataset = Dataset()
+        dataset.data = data
+        dataset.target = target
+        dataset.labels = self.labels
+        dataset.features = self.features
+        return dataset
+
+    def _validate(self):
+        assert len(self.data) == len(self.target)
+        assert isinstance(self.features[0], str)
+
     def _validate_extraction(self, features, extractor):
         len_features = len(list(features))
         len_keys = len(list(extractor.keys()))
@@ -193,3 +190,9 @@ class Dataset:
     def _log(self, *args, **kwargs):
         if self.logging:
             print(*args, **kwargs)
+
+    def _log_progress(self, name, current, overall):
+        name = name[:58] + (name[58:] and '...')
+        percent = current * 100 // overall
+        self._log('Process [{: >3}%] {: <61}'.format(percent, name),
+            flush=True, end='\r')

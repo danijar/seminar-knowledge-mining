@@ -1,15 +1,13 @@
-import os
 from SPARQLWrapper import SPARQLWrapper, JSON
-from .download import get_filename
 
 
 METADATA = {
-    'url':         'http://dbpedia.org/ontology/fileURL',
-    'extension':   'http://dbpedia.org/ontology/fileExtension',
-    'title':       'http://dbpedia.org/ontology/title',
+    'url': 'http://dbpedia.org/ontology/fileURL',
+    'extension': 'http://dbpedia.org/ontology/fileExtension',
+    'title': 'http://dbpedia.org/ontology/title',
     'description': 'http://commons.dbpedia.org/property/description',
-    'lat':         'http://www.w3.org/2003/01/geo/wgs84_pos#lat',
-    'long':        'http://www.w3.org/2003/01/geo/wgs84_pos#long',
+    'lat': 'http://www.w3.org/2003/01/geo/wgs84_pos#lat',
+    'long': 'http://www.w3.org/2003/01/geo/wgs84_pos#long',
 }
 
 
@@ -22,6 +20,7 @@ def fetch_uris_from_metadata(keywords, amount):
     uris = query_uris_from_keywords(ontology, keywords, amount)
     return uris
 
+
 def fetch_uris_from_articles(keywords, amount):
     """
     Query DBpedia for image uris where one of the keywords is found in the
@@ -30,6 +29,7 @@ def fetch_uris_from_articles(keywords, amount):
     ontology = '<http://dbpedia.org/ontology/galleryItem>'
     uris = query_uris_from_keywords(ontology, keywords, amount)
     return uris
+
 
 def fetch_metadata(uri):
     resource = '<{}>'.format(uri)
@@ -43,6 +43,7 @@ def fetch_metadata(uri):
             metadata[key] = metadata.pop(value)
     return metadata
 
+
 def fetch_properties(resource, properties):
     try:
         data = query_properties(resource)
@@ -51,8 +52,9 @@ def fetch_properties(resource, properties):
     except:
         print('Error retrieving', resource.strip('<>'))
 
+
 def query_uris_from_keywords(ontology, keywords, amount):
-    print('Query image URIs for:' , ','.join(keywords))
+    print('Query image URIs for:', ','.join(keywords))
     assert isinstance(ontology, str)
     keywords = '|'.join(keywords)
     keywords = r'(^|\\W)(' + keywords + r')(\\W|$)'
@@ -64,14 +66,17 @@ def query_uris_from_keywords(ontology, keywords, amount):
     uris = parse_uris(results)
     return list(uris)
 
+
 def query_uris(filters, amount=5000):
     """
     Query DBpedia for image uris where all of the SPARQL filter rules apply.
     """
     filters = '\n'.join(filters)
-    query = 'SELECT DISTINCT ?uri WHERE {{ {filters} }} LIMIT {amount}'.format(**locals())
+    query = 'SELECT DISTINCT ?uri WHERE {{ {filters} }} LIMIT {amount}'.format(
+        **locals())
     result = execute_query(query)
     return result
+
 
 def query_properties(resource):
     query = """SELECT DISTINCT ?subject ?predicate ?object WHERE {{
@@ -80,9 +85,11 @@ def query_properties(resource):
     result = execute_query(query)
     return result
 
+
 def parse_uris(json):
     for result in json['results']['bindings']:
         yield result['uri']['value']
+
 
 def parse_properties(data, predicates):
     properties = {x: '' for x in predicates}
@@ -91,6 +98,7 @@ def parse_properties(data, predicates):
         if predicate in predicates:
             properties[predicate] = result['object']['value']
     return properties
+
 
 def execute_query(query):
     sparql = SPARQLWrapper('http://commons.dbpedia.org/sparql')

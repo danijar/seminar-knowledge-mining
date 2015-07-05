@@ -12,12 +12,14 @@ def google_images_request(query, page):
     query = quote_plus(query)
     userip = '85.182.0.136'
     start = int(8 * page)
-    url = '{api}?v=1.0&q={query}&userip={userip}&rsz=8&start={start}'.format(**locals())
+    url = '{api}?v=1.0&q={query}&userip={userip}&rsz=8&start={start}'.format(
+        **locals())
     # Prepare request
     request = Request(url)
     service = 'http://{}/'.format(userip)
     request.add_header('Referer', service)
     return request
+
 
 def google_images(query, pages):
     for page in range(pages):

@@ -3,7 +3,7 @@ import json
 import uuid
 from datetime import datetime
 from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
-from helper.download import ensure_directory, get_filename, download_file
+from helper.download import ensure_directory, download_file
 from helper.dbpedia import (fetch_uris_from_metadata, fetch_uris_from_articles,
     fetch_metadata)
 
@@ -11,6 +11,7 @@ from helper.dbpedia import (fetch_uris_from_metadata, fetch_uris_from_articles,
 def read_lines(filename):
     with open(filename) as file_:
         return file_.read().splitlines()
+
 
 def images_and_metadata(uris, directory):
     """
@@ -35,6 +36,7 @@ def images_and_metadata(uris, directory):
         except:
             print('Error downloading image')
 
+
 def ensure_dbpedia_resource(uri):
     wikimedia = '//commons.wikimedia.org/wiki'
     dbpedia = '//commons.dbpedia.org/resource'
@@ -46,15 +48,18 @@ def ensure_dbpedia_resource(uri):
         raise RuntimeError('Resource identifier ' + uri +
             ' cannot be converted to DBpedia identifier')
 
+
 def store_metadata(metadata, directory, identifier):
     filename = os.path.join(directory, identifier + '.json')
     with open(filename, 'w') as file_:
         json.dump(metadata, file_)
 
+
 def store_image(url, directory, identifier):
     extension = url.split('.')[-1].lower()
     filename = os.path.join(directory, identifier + '.' + extension)
     download_file(url, directory, filename, log=False)
+
 
 def remove_prefix(text, prefix):
     if text.startswith(prefix):

@@ -9,7 +9,8 @@ from .feature import Feature, FeatureExtractionError
 
 class WordsFeature(Feature):
 
-    def __init__(self, samples, stopwords='english', limit=20, logging=False):
+    def __init__(self, samples=None, stopwords='english', limit=20,
+        logging=False):
         """
         Create a vocabulary which is a mapping from bucket names to lists of
         synonyms that fall into their bucket. Stopwords is a list of words that
@@ -20,15 +21,8 @@ class WordsFeature(Feature):
         self.stemmer = snowballstemmer.stemmer('english')
         self.tokens = re.compile(r'[A-Z]?[a-z]{2,}')
         self.logging = logging
-        # Process input samples
-        documents = self._texts_by_label(samples)
-        self.buckets = sorted(documents.keys())
-        self.overall = self._get_frequencies(self._flatten(documents.values()))
-        # Compute vocabulary
-        self._generate_vocabulary(documents, limit)
-        # List of all terms
-        self.terms = sorted(set(self._flatten(self.vocabulary.values())))
-        self.vectorizer = self._create_vectorizer(self.terms)
+        if samples:
+            self._generate_vocabulary(samples, limit)
 
     def name(self):
         return 'words'
@@ -53,7 +47,38 @@ class WordsFeature(Feature):
                     counts[bucket_index] += count
         yield from counts
 
-    def _texts_by_label(self, samples):
+    def get_params(self):
+        return {
+            'vocabulary': self.vocabulary,
+            'stopwords': self.stopwords
+        }
+
+    def set_params(self, params):
+        """
+        Initialize internal state from provided parameters.
+        """
+        self.vocabulary = params['vocabulary']
+        self.stopwords = params['stopwords']
+        self.buckets = sorted(self.vocabulary.keys())
+        self._initialize_vectorizer()
+
+    def _generate_vocabulary(self, samples, limit):
+        """
+        Initializes internal state from samples.
+        """
+        documents = self._read_samples(samples)
+        overall = self._get_frequencies(self._flatten(documents.values()))
+        self.buckets = sorted(documents.keys())
+        # Compute vocabulary
+        self.vocabulary = {key: [] for key in self.buckets}
+        for key, texts in documents.items():
+            words, freqs = self._get_top_words(texts, limit, overall)
+            self.vocabulary[key] = words
+            self._log(key + ':', ', '.join('{} {:.3f}'.format(x, y)
+                for x, y in zip(words, freqs)) + '\n')
+        self._initialize_vectorizer()
+
+    def _read_samples(self, samples):
         """
         Sort the samples by their label and return a directory from labels to
         lists of preprocessed text.
@@ -66,6 +91,15 @@ class WordsFeature(Feature):
             texts[sample.label].append(text)
         return texts
 
+    def _get_top_words(self, texts, limit, overall):
+        freqs = self._get_frequencies(texts)
+        freqs = self._compute_tfidf(freqs, overall)
+        freqs = sorted(freqs.items(), key=lambda x: x[1], reverse=True)
+        if len(freqs) > limit:
+            freqs = freqs[:limit]
+        words, freqs = [x[0] for x in freqs], [x[1] for x in freqs]
+        return words, freqs
+
     def _get_frequencies(self, texts):
         vectorizer = self._create_vectorizer()
         counts = vectorizer.fit_transform(texts)
@@ -75,29 +109,25 @@ class WordsFeature(Feature):
         freqs = {term: counts[i] / amount for term, i in mapping.items()}
         return freqs
 
-    def _get_top_words(self, texts, limit):
-        freqs = self._get_frequencies(texts)
-        freqs = self._compute_tfidf(freqs)
-        freqs = sorted(freqs.items(), key=lambda x: x[1], reverse=True)
-        if len(freqs) > limit:
-            freqs = freqs[:limit]
-        words, freqs = [x[0] for x in freqs], [x[1] for x in freqs]
-        return words, freqs
-
-    def _compute_tfidf(self, frequencies):
+    def _compute_tfidf(self, frequencies, overall):
         """
         Returns a copy of the frequencies mapping to TFIDF scores instead of
         the frequencies. TFIDF is a measure for how unique the frequency is
         compared to the overall dataset.
         """
         assert all(0 <= x <= 1 for x in frequencies.values())
-        assert all(0 <= x <= 1 for x in self.overall.values())
-        assert all(term in self.overall for term in frequencies)
+        assert all(0 <= x <= 1 for x in overall.values())
+        assert all(term in overall for term in frequencies)
         adjusted = {}
         for term in frequencies:
-            score = frequencies[term] / (1 - self.overall[term])
+            score = frequencies[term] / (1 - overall[term])
             adjusted[term] = score
         return adjusted
+
+    def _initialize_vectorizer(self):
+        # List of all terms
+        self.terms = sorted(set(self._flatten(self.vocabulary.values())))
+        self.vectorizer = self._create_vectorizer(self.terms)
 
     def _create_vectorizer(self, terms=None):
         args = {}
@@ -122,14 +152,6 @@ class WordsFeature(Feature):
 
     def _flatten(self, list_of_lists):
         return list(itertools.chain.from_iterable(list_of_lists))
-
-    def _generate_vocabulary(self, documents, limit):
-        self.vocabulary = {key: [] for key in self.buckets}
-        for key, texts in documents.items():
-            words, freqs = self._get_top_words(texts, limit)
-            self.vocabulary[key] = words
-            self._log(key + ':', ', '.join('{} {:.3f}'.format(x, y)
-                for x, y in zip(words, freqs)) + '\n')
 
     def _log(self, *args, **kwargs):
         if self.logging:

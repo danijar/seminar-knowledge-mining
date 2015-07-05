@@ -2,6 +2,10 @@ class Feature:
     """
     Represents a feature extractor that is constructued once and used to
     extract() a list of features from multiple samples.
+
+    The constructor may have parameters, but all should have default values so
+    that an empty instance can be created first and the state can be recovered
+    later using `set_params()`.
     """
 
     def name(self):
@@ -25,6 +29,20 @@ class Feature:
         generator of floats.
         """
         raise NotImplementedError
+
+    def get_params(self):
+        """
+        Parameters should represent the whole state of the feature extractor so
+        that the state of the extractor can be recovered fully. Should return
+        a dictionary.
+        """
+        return {}
+
+    def set_params(self, params):
+        """
+        Resets the internal state to the dictionary obtained from get_params().
+        """
+        pass
 
 
 class FeatureExtractionError(Exception):

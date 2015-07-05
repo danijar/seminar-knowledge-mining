@@ -7,6 +7,7 @@ from helper.download import ensure_directory, download_files, safe_characters
 def random_article():
     return 'http://en.wikipedia.org/wiki/Special:Random'
 
+
 def images_in_article(url):
     html = urlopen(url).read().decode('utf-8')
     soup = BeautifulSoup(html)

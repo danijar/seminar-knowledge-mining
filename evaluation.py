@@ -63,6 +63,7 @@ if __name__ == '__main__':
 
     dataset = Dataset()
     dataset.load(args.features)
+    dataset.normalize()
 
     print_chi(dataset)
     print('Write CSV table to', args.output)

@@ -28,7 +28,7 @@ class Dataset:
         self.features = list(self._feature_names())
         for index, sample in enumerate(self.samples):
             # Display progress
-            name = sample.filename[len(root):]
+            name = sample.filename[len(root) + 1:]
             self._log_progress(name, index, len(self.samples))
             # Find label index
             if sample.label not in self.labels:

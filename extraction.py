@@ -1,3 +1,4 @@
+import os
 from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
 from helper.dataset import Dataset
 from feature.color import ColorFeature
@@ -29,6 +30,9 @@ if __name__ == '__main__':
     parser.add_argument('-t', '--textual', action='store_true',
         help='Whether to extract textual features; requires JSON metadata '
         'files for all the images')
+    parser.add_argument('-s', '--stopwords', default='english',
+        help='Filename of a list of words that are ignored for the '
+        'vocabulary; defaults to a built-in english stopword list')
     parser.add_argument('-o', '--output', default='<dataset>/dataset.json',
         help='Where to store the extracted features')
     args = parser.parse_args()
@@ -45,12 +49,14 @@ if __name__ == '__main__':
         # extractors.append(BlobFeature())
         # extractors.append(BriefFeature())
     if args.textual:
+        samples = read_samples(args.dataset)
+        if os.path.isfile(args.stopwords):
+            args.stopwords = open(args.stopwords)
         extractors.append(GeoFeature())
         extractors.append(FormatFeature())
-        extractors.append(WordsFeature(read_samples(args.dataset)))
+        extractors.append(WordsFeature(samples, args.stopwords))
         # extractors.append(RandomFeature())
 
     dataset = Dataset(logging=True)
     dataset.read(args.dataset, extractors)
-    dataset.normalize()
     dataset.save(args.output)

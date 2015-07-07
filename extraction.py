@@ -5,6 +5,7 @@ from feature.color import ColorFeature
 from feature.histogram import HistogramFeature
 from feature.blob import BlobFeature
 from feature.gradient import GradientFeature
+from feature.face import FaceFeature
 from feature.brief import BriefFeature
 from feature.geo import GeoFeature
 from feature.format import FormatFeature
@@ -33,6 +34,8 @@ if __name__ == '__main__':
     parser.add_argument('-s', '--stopwords', default='english',
         help='Filename of a list of words that are ignored for the '
         'vocabulary; defaults to a built-in english stopword list')
+    parser.add_argument('-f', '--face', default='data/face_detection.xml',
+        help='Path to a trained classifier for face detection.')
     parser.add_argument('-o', '--output', default='<dataset>/dataset.json',
         help='Where to store the extracted features')
     args = parser.parse_args()
@@ -48,6 +51,8 @@ if __name__ == '__main__':
         extractors.append(GradientFeature())
         # extractors.append(BlobFeature())
         # extractors.append(BriefFeature())
+        if os.path.isfile(args.face):
+            extractors.append(FaceFeature(args.face))
     if args.textual:
         samples = read_samples(args.dataset)
         if os.path.isfile(args.stopwords):

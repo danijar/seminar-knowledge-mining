@@ -4,7 +4,7 @@ Seminar Knowledge Mining
 [![Code Climate](https://codeclimate.com/github/danijar/seminar-knowledge-mining/badges/gpa.svg)](https://codeclimate.com/github/danijar/seminar-knowledge-mining)
 
 Wikimedia image classification and suggestions for article authors.
- 
+
 Set up instructions
 -------------------
 
@@ -31,11 +31,13 @@ don't have them already.
 2. Create a virtual environment inside the repository root by runnning
 `virtualenv .` or if you have multiple Python versions `virtualenv -p python3
 .`.
-3. Activate your virtual environment using `source bin/activate`. Make sure
+3. Make sure OpenCV 3 is installed by following these instructions:
+https://blog.kevin-brown.com/programming/2014/09/27/building-and-installing-opencv-3.html
+4. Activate your virtual environment using `source bin/activate`. Make sure
 that the repository name is in front of your shell promt now.
-4. Install dependencies inside your virtual environment using `pip install -r
+5. Install dependencies inside your virtual environment using `pip install -r
 requirements.txt`.
-5. UTF-8 is required, so you may need to add these lines to your
+6. UTF-8 is required, so you may need to add these lines to your
 `~/.bash_profile` and apply the changes with `source ~/.bash_profile`.
 
         export LC_ALL=en_US.UTF-8

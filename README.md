@@ -13,7 +13,7 @@ Set up instructions
 1. Install these dependencies by using your system's package manager if you
 don't have them already.
 
-    | Depdendency |     Aptitude     |       Pacman      | Homebrew |
+    | Depdendency |       Apt        |       Pacman      | Homebrew |
     | ----------- | ---------------- | ----------------- | -------- |
     | Python 3    | python3          | python            |          |
     | Cython      | cython3          | cython            |          |

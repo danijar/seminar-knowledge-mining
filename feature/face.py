@@ -16,8 +16,8 @@ class FaceFeature(Feature):
         self.params = {
             'scaleFactor': 1.1,
             'minNeighbors': 4,
-            'minSize': (50, 50),
-            'maxSize': (2000, 2000),
+            'minSize': (16, 16),
+            'maxSize': (1024, 1024),
             'flags': cv2.CASCADE_SCALE_IMAGE
         }
         self.params.update(kwargs)

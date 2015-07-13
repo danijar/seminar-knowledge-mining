@@ -22,6 +22,7 @@ class Dataset:
         self.stds = None
 
     def read(self, root, extractors):
+        root = root.strip('/\\')
         self.data, self.target, self.labels = [], [], []
         self._read_samples(root)
         self.extractors = extractors

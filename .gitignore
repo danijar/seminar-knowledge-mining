@@ -17,3 +17,6 @@ __pycache__/
 
 # Downloaded files
 /data
+
+# Build
+/opencv

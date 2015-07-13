@@ -31,12 +31,17 @@ don't have them already.
 2. Create a virtual environment inside the repository root by runnning
 `virtualenv .` or if you have multiple Python versions `virtualenv -p python3
 .`.
-3. Make sure OpenCV 3 is installed by following these instructions:
-https://blog.kevin-brown.com/programming/2014/09/27/building-and-installing-opencv-3.html
-4. Activate your virtual environment using `source bin/activate`. Make sure
+3. Activate your virtual environment using `source bin/activate`. Make sure
 that the repository name is in front of your shell promt now.
-5. Install dependencies inside your virtual environment using `pip install -r
-requirements.txt`.
+4. Install dependencies inside your virtual environment
+
+        pip install -r requirements.txt
+
+5. Install OpenCV 3.0 with bindings for Python 3 by running
+
+        chmod +x tool/setup-opencv.sh
+        tool/setup-opencv.sh
+
 6. UTF-8 is required, so you may need to add these lines to your
 `~/.bash_profile` and apply the changes with `source ~/.bash_profile`.
 

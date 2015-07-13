@@ -34,8 +34,9 @@ if __name__ == '__main__':
     parser.add_argument('-s', '--stopwords', default='english',
         help='Filename of a list of words that are ignored for the '
         'vocabulary; defaults to a built-in english stopword list')
-    parser.add_argument('-f', '--face', default='data/face_detection.xml',
-        help='Path to a trained classifier for face detection.')
+    parser.add_argument('-f', '--trained-faces',
+        default='data/trained-faces.xml',
+        help='Path to a trained face detection classifier.')
     parser.add_argument('-o', '--output', default='<dataset>/dataset.json',
         help='Where to store the extracted features')
     args = parser.parse_args()
@@ -51,8 +52,11 @@ if __name__ == '__main__':
         extractors.append(GradientFeature())
         # extractors.append(BlobFeature())
         # extractors.append(BriefFeature())
-        if os.path.isfile(args.face):
-            extractors.append(FaceFeature(args.face))
+        if os.path.isfile(args.trained_faces):
+            extractors.append(FaceFeature(args.trained_faces))
+        else:
+            print('Skip face feature since the trained face detector was not '
+                'found at {}.'.format(args.trained_faces))
     if args.textual:
         samples = read_samples(args.dataset)
         if os.path.isfile(args.stopwords):
